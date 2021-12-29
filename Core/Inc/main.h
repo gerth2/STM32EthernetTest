@@ -59,6 +59,14 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define GPIO_LED_Pin GPIO_PIN_13
 #define GPIO_LED_GPIO_Port GPIOC
+#define JOY2_Y_Pin GPIO_PIN_3
+#define JOY2_Y_GPIO_Port GPIOA
+#define JOY2_X_Pin GPIO_PIN_2
+#define JOY2_X_GPIO_Port GPIOA
+#define JOY1_Y_Pin GPIO_PIN_0
+#define JOY1_Y_GPIO_Port GPIOA
+#define JOY1_X_Pin GPIO_PIN_1
+#define JOY1_X_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

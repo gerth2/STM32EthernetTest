@@ -109,10 +109,10 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
 		0x05, 0x01,  /*       USAGE_PAGE (Generic Desktop) */
 		0x09, 0x30,  /*       USAGE (X)                    */
 		0x09, 0x31,  /*       USAGE (Y)                    */
-		0x15, 0x81, // Logical Minimum (-127)
-		0x25, 0x7F, // Logical Maximum (127)
-		0x75, 0x08, // Report Size (8) -> 8 bits (1 byte value)
-		0x95, 0x02, // Report Count (2) -> 2x = 2 bytes -> no bit stuffing
+		0x15, 0x81,  /*       Logical Minimum (-127) */
+		0x25, 0x7F,  /*       Logical Maximum (127)*/
+		0x75, 0x08,  /*       Report Size (8) -> 8 bits (1 byte value) */
+		0x95, 0x02,  /*       Report Count (2) -> 2x = 2 bytes -> no bit stuffing */
 		0x81, 0x02,  /*       INPUT (Data,Var,Abs)         */
 		0xc0,        /* 	END_COLLECTION                 */
   /* USER CODE END 0 */
