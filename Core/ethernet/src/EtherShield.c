@@ -221,9 +221,9 @@ uint16_t ES_packetloop_icmp_tcp(uint8_t *buf,uint16_t plen) {
 	return packetloop_icmp_tcp(buf,plen);
 }
 
-/*uint16_t ES_fill_tcp_data_p(uint8_t *buf,uint16_t pos, const prog_char *progmem_s){
-	return fill_tcp_data_p(buf, pos, progmem_s);
-}*/
+uint16_t ES_fill_tcp_data_p(uint8_t *buf,uint16_t pos, const char *progmem_s){
+	return fill_tcp_data(buf, pos, progmem_s);
+}
 
 uint16_t ES_fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s){
 	return fill_tcp_data(buf,pos, s);

@@ -53,7 +53,7 @@ void make_udp_reply_from_request(uint8_t *buf,char *data,uint16_t datalen,uint16
 // of the tcp data if there is tcp data part
 uint16_t packetloop_icmp_tcp(uint8_t *buf,uint16_t plen);
 // functions to fill the web pages with data:
-//extern uint16_t fill_tcp_data_p(uint8_t *buf,uint16_t pos, const prog_char *progmem_s);
+uint16_t fill_tcp_data_p(uint8_t *buf,uint16_t pos, const char *progmem_s);
 uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s);
 uint16_t fill_tcp_data_len(uint8_t *buf,uint16_t pos, const char *s, uint16_t len);
 // send data from the web server to the client:

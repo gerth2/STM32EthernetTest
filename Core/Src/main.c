@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "LEDBlinker.h"
 #include "gamepad.h"
+#include "networking.h"
 #include <math.h>
 /* USER CODE END Includes */
 
@@ -123,9 +124,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-	LEDBlinkerInit();
-	GamepadInit();
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -140,6 +138,10 @@ int main(void)
   MX_ADC1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+
+	//LEDBlinkerInit();
+	GamepadInit();
+	NetworkingInit(&hspi1);
 
   /* USER CODE END 2 */
 
@@ -407,7 +409,8 @@ void StartTask_10ms(void *argument)
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		/* 10mS Periodic Code START */
 
-		LEDBlinkerPeriodic();
+		//LEDBlinkerPeriodic();
+		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}

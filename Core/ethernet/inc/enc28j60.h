@@ -2,6 +2,7 @@
 #define __ENC28J60_H
 
 #include "stm32includes.h"
+#include "main.h"
 #define Delay HAL_Delay
 
 /*
@@ -15,22 +16,26 @@ static inline void uDelay(uint32_t useconds) {
 */
 
 #ifndef ETHERNET_LED_GPIO
-#	error Please define ETHERNET_LED_GPIO, for example by gcc option -DETHERNET_LED_GPIO=GPIOA
+//#	error Please define ETHERNET_LED_GPIO, for example by gcc option -DETHERNET_LED_GPIO=GPIOA
+	#define ETHERNET_LED_GPIO GPIO_LED_GPIO_Port
 #endif
 #ifndef ETHERNET_LED_PIN
-#	error Please define ETHERNET_LED_PIN, for example by gcc option -DETHERNET_LED_PIN=GPIO_PIN_5
+//#	error Please define ETHERNET_LED_PIN, for example by gcc option -DETHERNET_LED_PIN=GPIO_PIN_5
+	#define ETHERNET_LED_PIN GPIO_LED_Pin
 #endif
 
 #ifndef ETHERNET_CS_GPIO
-#	error Please define chip-select GPIO port ETHERNET_CS_GPIO, for example by gcc option -DETHERNET_CS_GPIO=GPIOA
+//#	error Please define chip-select GPIO port ETHERNET_CS_GPIO, for example by gcc option -DETHERNET_CS_GPIO=GPIOA
+	#define ETHERNET_CS_GPIO SPI1_ETH_CS_GPIO_Port
 #endif
 #ifndef ETHERNET_CS_PIN
-#	error Please define chip-select pin ETHERNET_CS_PIN, for example by gcc option -DETHERNET_CS_PIN=GPIO_PIN_4
+//#	error Please define chip-select pin ETHERNET_CS_PIN, for example by gcc option -DETHERNET_CS_PIN=GPIO_PIN_4
+	#define ETHERNET_CS_PIN SPI1_ETH_CS_Pin
 #endif
 
 #ifndef ETHERNET_CS_DELAY
-#	warning ETHERNET_CS_DELAY is not defined. Setting to "2" (mseconds). Adapter may work very slow or not properly. If the latency on "1" is too big, but on "0" the adapter is not working properly, you can try values >= 10: it will use other delay method (for example try value 1000).
-#	define ETHERNET_CS_DELAY 2
+#	//warning ETHERNET_CS_DELAY is not defined. Setting to "2" (mseconds). Adapter may work very slow or not properly. If the latency on "1" is too big, but on "0" the adapter is not working properly, you can try values >= 10: it will use other delay method (for example try value 1000).
+#	define ETHERNET_CS_DELAY 0
 #endif
 
 #if ETHERNET_CS_DELAY >= 10
