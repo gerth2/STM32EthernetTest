@@ -398,8 +398,7 @@ void serverInit(void){
       return;
    }
 
-	MS_setSocket(&ms,sockPtr,msBuf.rec,sizeof(msBuf.rec),
-				 msBuf.send,sizeof(msBuf.send));
+	MS_setSocket(&ms, sockPtr, msBuf.rec, sizeof(msBuf.rec), msBuf.send, sizeof(msBuf.send));
 	RecData_runServer(&rd, &cd, &wph);
 
 	serverIsRunning = TRUE;

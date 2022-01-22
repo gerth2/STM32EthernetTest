@@ -420,6 +420,7 @@ void StartTask_10ms(void *argument)
 	TickType_t xLastWakeTime;
 	const TickType_t xFrequency = (TickType_t) round(0.010 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
+	serverInit();
 
 	/* Infinite loop */
 	for (;;) {
@@ -428,6 +429,7 @@ void StartTask_10ms(void *argument)
 
 		//LEDBlinkerPeriodic();
 		NetworkingPeriodic();
+		serverUpdate();
 
 		/* 10mS Periodic Code END */
 	}
@@ -473,10 +475,11 @@ void StartTask_Server(void *argument)
 {
   /* USER CODE BEGIN StartTask_Server */
   /* Infinite loop */
-  serverInit();
+
   for(;;)
   {
-    serverUpdate();
+
+    vTaskDelay(10);
   }
   /* USER CODE END StartTask_Server */
 }

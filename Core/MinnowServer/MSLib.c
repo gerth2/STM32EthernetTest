@@ -300,17 +300,6 @@ MS_webServer(MS* o, WssProtocolHandshake* wph)
    U8* auth=0;
    wph->request=0;
 
-#ifdef MS_SEC
-   if(o->mst.isSecure)
-   {
-      if( (rc = seSec_handshake(o->mst.u.sc, o->mst.sock, 3000, 0)) <= 0 )
-      {
-         xprintf(("SSL handshake failed %d\n", rc));
-         return MS_ERR_SSL_HANDSHAKE;
-      }
-   }
-#endif
-
    for(;;)
    {
       if( (rc = MST_read(&o->mst,&rbuf,100)) <= 0 )
@@ -322,7 +311,6 @@ MS_webServer(MS* o, WssProtocolHandshake* wph)
       end=msstrstrn(rbuf, rc, httpEndMarker);
       if(end && !ptr) /*Most browsers send the complete header in first frame*/
          break; 
-      /* We use the SharkSSL send buffer for temp storage */
       if(!ptr)
          sbuf = ptr = MS_prepSend(o, FALSE, &sblen);
       if(sblen < rc)
