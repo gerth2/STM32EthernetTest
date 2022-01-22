@@ -90,7 +90,7 @@ typedef signed   long long S64;
  */
 #define INFINITE_TMO (~((U32)0))
 
-#include "selibplat.h"
+#include <selibplat.h>
 
 #ifndef SE_CTX
 #define SeCtx void
@@ -131,15 +131,6 @@ typedef signed   long long S64;
 #define baMalloc(s)        umm_malloc(s)
 #define baRealloc(m, s)    umm_realloc(m, s)
 #define baFree(m)          umm_free(m)
-#endif
-
-#ifndef NO_BSD_SOCK
-/** The SOCKET object/handle is an 'int' when using a BSD compatible
-    TCP/IP stack. Non BSD compatible TCP IP stacks must set the macro
-    NO_BSD_SOCK and define the SOCKET object. See the header file
-    selib.h for details.
-*/
-#define SOCKET int
 #endif
 
 #ifndef SE_CTX

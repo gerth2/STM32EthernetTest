@@ -1,3 +1,6 @@
+#ifndef NETWORKING_H
+#define NETWORKING_H
+
 #include "EtherShield.h"
 
 #define NET_BUF_SIZE (1<<10)
@@ -13,4 +16,6 @@ void NetworkingPeriodic(void);
 
 #ifndef PSTR
 #define PSTR(str) (str)
+#endif
+
 #endif

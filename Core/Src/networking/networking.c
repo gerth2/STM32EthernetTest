@@ -3,9 +3,13 @@
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
 #include "NetworkBufferManagement.h"
+#include "server.h"
 #include <string.h>
 
 
+
+//////////////////////////////////
+// FreeRTOS/Hardware Interface
 static const uint8_t ucIPAddress[ 4 ] = { 10, 111, 76, 123 };
 static const uint8_t ucNetMask[ 4 ] = { 255, 255, 255, 0 };
 static const uint8_t ucGatewayAddress[ 4 ] = { 10, 111, 76, 1 };
@@ -17,10 +21,6 @@ static const uint8_t ucDNSServerAddress[ 4 ] = { 1, 1, 1, 1 };
 static uint8_t buf[BUFFER_SIZE+1];
 
 static SPI_HandleTypeDef *spiHandle = NULL;
-
-
-//////////////////////////////////
-// FreeRTOS/MAC Interface
 
 BaseType_t xNetworkInterfaceInitialise( void )
 {
@@ -143,15 +143,23 @@ void handlePackets(void)
 }
 
 
+#define SERVER_NOCHANGE 0
+#define SERVER_INIT 1
+#define SERVER_SHUTDOWN 2
+uint8_t serverStatus = SERVER_NOCHANGE;
+
+void HttpserverTask( void *pvParameters );
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
     if( eNetworkEvent == eNetworkUp )
     {
 		//FreeRTOS_printf("vApplicationIP: network up.\n");
 		//TODO - specific tasks like start servers and whatnot when the network goes up?
+    	serverStatus = SERVER_INIT;
 
     } else if ( eNetworkEvent == eNetworkDown) {
     	//FreeRTOS_printf("vApplicationIP: network down.\n");
+    	serverStatus = SERVER_SHUTDOWN;
     }
 }
 
@@ -206,9 +214,17 @@ void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
 }
 
 void NetworkingPeriodic() {
-
 	handlePackets();
 
+	if(serverStatus == SERVER_INIT){
+		serverInit();
+		serverStatus = SERVER_NOCHANGE;
+	} else if(serverStatus == SERVER_SHUTDOWN){
+		serverShutdown();
+		serverStatus = SERVER_NOCHANGE;
+	}
+
+	serverUpdate();
 }
 
 
