@@ -26,6 +26,7 @@
 #include "LEDBlinker.h"
 #include "gamepad.h"
 #include "networking.h"
+#include "server.h"
 #include <math.h>
 /* USER CODE END Includes */
 
@@ -63,7 +64,7 @@ const osThreadAttr_t defaultTask_attributes = {
 };
 /* Definitions for task_10ms */
 osThreadId_t task_10msHandle;
-uint32_t task_10msBuffer[ 128 ];
+uint32_t task_10msBuffer[ 1024 ];
 osStaticThreadDef_t task_10msControlBlock;
 const osThreadAttr_t task_10ms_attributes = {
   .name = "task_10ms",
@@ -75,7 +76,7 @@ const osThreadAttr_t task_10ms_attributes = {
 };
 /* Definitions for task_500ms */
 osThreadId_t task_500msHandle;
-uint32_t task_500msBuffer[ 128 ];
+uint32_t task_500msBuffer[ 512 ];
 osStaticThreadDef_t task_500msControlBlock;
 const osThreadAttr_t task_500ms_attributes = {
   .name = "task_500ms",
@@ -84,6 +85,18 @@ const osThreadAttr_t task_500ms_attributes = {
   .stack_mem = &task_500msBuffer[0],
   .stack_size = sizeof(task_500msBuffer),
   .priority = (osPriority_t) osPriorityBelowNormal,
+};
+/* Definitions for task_Server */
+osThreadId_t task_ServerHandle;
+uint32_t task_ServerBuffer[ 1024 ];
+osStaticThreadDef_t task_ServerControlBlock;
+const osThreadAttr_t task_Server_attributes = {
+  .name = "task_Server",
+  .cb_mem = &task_ServerControlBlock,
+  .cb_size = sizeof(task_ServerControlBlock),
+  .stack_mem = &task_ServerBuffer[0],
+  .stack_size = sizeof(task_ServerBuffer),
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* USER CODE BEGIN PV */
 
@@ -97,6 +110,7 @@ static void MX_SPI1_Init(void);
 void StartDefaultTask(void *argument);
 void StartTask_10ms(void *argument);
 void StartTask500ms(void *argument);
+void StartTask_Server(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -173,6 +187,9 @@ int main(void)
 
   /* creation of task_500ms */
   task_500msHandle = osThreadNew(StartTask500ms, NULL, &task_500ms_attributes);
+
+  /* creation of task_Server */
+  task_ServerHandle = osThreadNew(StartTask_Server, NULL, &task_Server_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -428,7 +445,7 @@ void StartTask500ms(void *argument)
 {
   /* USER CODE BEGIN StartTask500ms */
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.100 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.500 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 
 
@@ -443,6 +460,25 @@ void StartTask500ms(void *argument)
 
 	}
   /* USER CODE END StartTask500ms */
+}
+
+/* USER CODE BEGIN Header_StartTask_Server */
+/**
+* @brief Function implementing the task_Server thread.
+* @param argument: Not usedserverInit
+* @retval None
+*/
+/* USER CODE END Header_StartTask_Server */
+void StartTask_Server(void *argument)
+{
+  /* USER CODE BEGIN StartTask_Server */
+  /* Infinite loop */
+  serverInit();
+  for(;;)
+  {
+    serverUpdate();
+  }
+  /* USER CODE END StartTask_Server */
 }
 
 /**

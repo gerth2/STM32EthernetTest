@@ -215,16 +215,6 @@ void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
 
 void NetworkingPeriodic() {
 	handlePackets();
-
-	if(serverStatus == SERVER_INIT){
-		serverInit();
-		serverStatus = SERVER_NOCHANGE;
-	} else if(serverStatus == SERVER_SHUTDOWN){
-		serverShutdown();
-		serverStatus = SERVER_NOCHANGE;
-	}
-
-	serverUpdate();
 }
 
 
