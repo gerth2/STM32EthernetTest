@@ -5,8 +5,12 @@
 #include "NetworkBufferManagement.h"
 #include <string.h>
 
-uint8_t mac[] = { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
-uint8_t ip[] = { 10, 111, 76, 123 };
+
+static const uint8_t ucIPAddress[ 4 ] = { 10, 111, 76, 123 };
+static const uint8_t ucNetMask[ 4 ] = { 255, 255, 255, 0 };
+static const uint8_t ucGatewayAddress[ 4 ] = { 10, 111, 76, 1 };
+static uint8_t ucMACAddress[ 6 ] = { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+static const uint8_t ucDNSServerAddress[ 4 ] = { 1, 1, 1, 1 };
 
 #define MYWWWPORT 80
 #define BUFFER_SIZE 550
@@ -24,7 +28,7 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 	if(spiHandle != NULL){
 		ES_enc28j60SpiInit(spiHandle);
-		ES_enc28j60Init(mac);
+		ES_enc28j60Init(ucMACAddress);
 
 		uint8_t enc28j60_rev = ES_enc28j60Revision();
 
@@ -139,12 +143,66 @@ void handlePackets(void)
 }
 
 
+void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
+{
+    if( eNetworkEvent == eNetworkUp )
+    {
+		//FreeRTOS_printf("vApplicationIP: network up.\n");
+		//TODO - specific tasks like start servers and whatnot when the network goes up?
+
+    } else if ( eNetworkEvent == eNetworkDown) {
+    	//FreeRTOS_printf("vApplicationIP: network down.\n");
+    }
+}
+
+void vApplicationPingReplyHook( ePingReplyStatus_t eStatus, uint16_t usIdentifier )
+{
+    switch( eStatus )
+    {
+        case eSuccess    :
+            /* A valid ping reply has been received.  Post the sequence number
+            on the queue that is read by the vSendPing() function below.  Do
+            not wait more than 10ms trying to send the message if it cannot be
+            sent immediately because this function is called from the TCP/IP
+            RTOS task - blocking in this function will block the TCP/IP RTOS task. */
+            //xQueueSend( xPingReplyQueue, &usIdentifier, 10 / portTICK_PERIOD_MS );
+        	//TODO - no idea how this is used or if it matters
+            break;
+
+        case eInvalidChecksum :
+        case eInvalidData :
+            /* A reply was received but it was not valid. */
+            break;
+    }
+}
+
+BaseType_t xApplicationGetRandomNumber( uint32_t * pulNumber ){
+	*pulNumber = 0x00000004; // Chosen by a dice roll
+	// TODO make this actually crypto secure by reading from an analog input or whatevs?
+	return pdTRUE;
+}
+
+uint32_t ulApplicationGetNextSequenceNumber( uint32_t ulSourceAddress,
+                                             uint16_t usSourcePort,
+                                             uint32_t ulDestinationAddress,
+                                             uint16_t usDestinationPort ){
+	// TODO make this actually crypto secure by reading from an analog input or whatevs?
+	return 0x00000004;
+}
+
+
 
 //////////////////////////////////
 // RTOS Tasking Interface
 
 void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
 	spiHandle = spiHandle_in;
+    /* Initialise the TCP/IP stack. */
+    FreeRTOS_IPInit( ucIPAddress,
+                     ucNetMask,
+                     ucGatewayAddress,
+                     ucDNSServerAddress,
+                     ucMACAddress );
 }
 
 void NetworkingPeriodic() {

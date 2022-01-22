@@ -36,10 +36,10 @@
                                         BaseType_t xReleaseAfterSend );
 
 /* The following function is defined only when BufferAllocation_1.c is linked in the project. */
-    void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkBuffers[ ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS ] );
+    //void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkBuffers[ ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS ] );
 
 /* The following function is defined only when BufferAllocation_1.c is linked in the project. */
-    BaseType_t xGetPhyLinkStatus( void );
+    //BaseType_t xGetPhyLinkStatus( void );
 
     #ifdef __cplusplus
         } /* extern "C" */
