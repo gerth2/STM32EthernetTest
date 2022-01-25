@@ -30,15 +30,18 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 		//Cycle the reset pin
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
-		HAL_Delay(1000);
+		HAL_Delay(250);
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
+		HAL_Delay(250);
 
 
+		// Init the Hardwaare
 		ES_enc28j60SpiInit(spiHandle);
 		ES_enc28j60Init(ucMACAddress);
 
 		uint8_t enc28j60_rev = ES_enc28j60Revision();
 
+		// Confirm the chip responded with a valid version
 		if (enc28j60_rev > 0) {
 			xReturn = pdPASS;
 		}

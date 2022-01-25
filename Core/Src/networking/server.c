@@ -376,6 +376,7 @@ int fetchPage(void* hndl, MST* mst, U8* path)
       sblen=MST_getSendBufSize(mst);
       sptr=MST_getSendBufPtr(mst);
    }
+   vTaskDelay(200);
    return 1;
 }
 
@@ -410,17 +411,11 @@ void serverUpdate(void){
 		switch(se_accept(&listenSockPtr, 50, &sockPtr))
 		{
 		 case 1: /* Accepted new client connection i.e. new browser conn. */
-		 {
-			/* If SMQ connection active: terminate immediately. */
-			if( ! ConnData_WebSocketMode(&cd) ){
-			   //revert2WsCon(&sharkSslClient,&rd,&cd,&ms); //TODO what is this? do nothing I guess?
-			}
 
 			MS_setSocket(&ms, sockPtr, msBuf.rec, sizeof(msBuf.rec), msBuf.send, sizeof(msBuf.send));
 			RecData_runServer(&rd, &cd, &wph);
 			se_close(sockPtr);
 
-		 }
 		 break;
 
 		 case 0: /* se_accept 50ms timeout */
