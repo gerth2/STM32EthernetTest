@@ -428,8 +428,8 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 
 		//LEDBlinkerPeriodic();
-		NetworkingPeriodic();
 		serverUpdate();
+		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
@@ -482,6 +482,27 @@ void StartTask_Server(void *argument)
     vTaskDelay(10);
   }
   /* USER CODE END StartTask_Server */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
 
 /**

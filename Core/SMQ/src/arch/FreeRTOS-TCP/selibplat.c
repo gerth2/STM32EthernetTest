@@ -1,5 +1,6 @@
 #include "selib.h"
 
+
 int se_sockValid(SOCKET* sock)
 {
    return *sock != FREERTOS_INVALID_SOCKET;
@@ -40,7 +41,7 @@ int se_bind(SOCKET* sock, uint16_t port)
    {
       return -1;
    }
-   addr.sin_addr=0x0;
+   addr.sin_addr= 0x0;
    addr.sin_port = FreeRTOS_htons(port);
    if(FreeRTOS_bind(*sock, &addr, addrlen))
    {
