@@ -352,7 +352,7 @@ int fetchPage(void* hndl, MST* mst, U8* path)
 {
    static const U8 indexPage[] = "<!DOCTYPE html> <html> <head/> <body><h1> Custom Web Content </h1></body> </html>";
 
-   static const U8 egz[] = {"\r\ncontent-type: text/html; charset=UTF-8\r\nContent-Encoding: gzip"};
+   static const U8 egz[] = {"\r\ncontent-type: text/html; charset=UTF-8"};
    U8* sptr;
    const U8* dptr=indexPage;
    int sblen=MST_getSendBufSize(mst);
