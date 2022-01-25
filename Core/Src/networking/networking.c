@@ -27,6 +27,13 @@ BaseType_t xNetworkInterfaceInitialise( void )
 	BaseType_t xReturn = pdFAIL;
 
 	if(spiHandle != NULL){
+
+		//Cycle the reset pin
+		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
+		HAL_Delay(1000);
+		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
+
+
 		ES_enc28j60SpiInit(spiHandle);
 		ES_enc28j60Init(ucMACAddress);
 
