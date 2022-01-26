@@ -1,6 +1,8 @@
 import os,gzip,json
 from string import Template
 
+from cachetools import RRCache
+
 TMPLT_FILE = "./index_tmplt.c"
 OUT_FILE = "../Core/Src/networking/index.c"
 src_file_list = []
@@ -17,14 +19,15 @@ class FileContents():
         self.mimeType = tmp[1].replace(".", "")
 
         with open(self.sourceFile, "r") as infile:
-            self.fileContentsStr = infile.read()
-            self.compressedBytes = gzip.compress(self.fileContentsStr.encode("utf-8"))
+            self.fileContentsStr = infile.read().encode("utf-8")
+            self.compressedBytes = gzip.compress(self.fileContentsStr)
 
     def getCompressedDeclaration(self):
         return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join([hex(x) for x in self.compressedBytes]))
 
     def getDeclaration(self):
-        return "static const U8 {}[] = \"{}\";".format(self.codeName, json.dumps(self.fileContentsStr).strip('"'))
+        #return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join(["\'{}\'".format(char) for char in json.dumps(self.fileContentsStr).strip("\"").replace("\"", "\\\"").replace("\'", "\\\'")]))
+        return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join([hex(x) for x in self.fileContentsStr]))
 
 
 if __name__ == "__main__":

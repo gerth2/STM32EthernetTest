@@ -428,8 +428,6 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 
 		//LEDBlinkerPeriodic();
-		serverUpdate();
-		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
@@ -478,8 +476,9 @@ void StartTask_Server(void *argument)
 
   for(;;)
   {
-
-    vTaskDelay(10);
+	serverUpdate();
+	NetworkingPeriodic();
+    vTaskDelay(1);
   }
   /* USER CODE END StartTask_Server */
 }
