@@ -347,39 +347,6 @@ static int openServerSock(SOCKET* sock)
    return status;
 }
 
-//Page-to-response handler. Returns 1 if the requested page could be returned, 0 otherwise.
-int fetchPage(void* hndl, MST* mst, U8* path)
-{
-   static const U8 indexPage[] = "<!DOCTYPE html> <html> <head/> <body><h1> Custom Web Content </h1></body> </html>";
-
-   static const U8 egz[] = {"\r\ncontent-type: text/html; charset=UTF-8"};
-   U8* sptr;
-   const U8* dptr=indexPage;
-   int sblen=MST_getSendBufSize(mst);
-   int delta=sblen;
-   int size=sizeof(indexPage);
-   (void)hndl;
-   if(path[0]!='/' || path[1]) /* if path is not "/" */
-      return 0; /* not found */
-   sptr=msRespCT(MST_getSendBufPtr(mst), &sblen, size, egz);
-   delta = delta-sblen;
-   while(size)
-   {
-      if(sblen > size)
-         sblen = size;
-      memcpy(sptr, dptr, sblen);
-      if(MST_write(mst,0,sblen+delta) < 0)
-         break;
-      size-=sblen;
-      dptr+=sblen;
-      delta=0;
-      sblen=MST_getSendBufSize(mst);
-      sptr=MST_getSendBufPtr(mst);
-   }
-   vTaskDelay(200);
-   return 1;
-}
-
 uint8_t serverIsRunning = FALSE;
 
 void serverInit(void){
