@@ -232,7 +232,7 @@ void _xprintf(const char* fmt, ...);
 #endif
 #else
 #ifndef xprintf
-#define xprintf(data)
+#define xprintf(data) printf(data)
 #endif
 #endif
 

@@ -48,7 +48,7 @@ int se_bind(SOCKET* sock, uint16_t port)
       se_close(sock);
       return -3;
    }
-   if(FreeRTOS_listen(*sock, 4))
+   if(FreeRTOS_listen(*sock, 10))
    {
       se_close(sock);
       return -2;

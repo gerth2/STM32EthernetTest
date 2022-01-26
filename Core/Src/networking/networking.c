@@ -28,6 +28,7 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 	if(spiHandle != NULL){
 
+		printf("Starting MAC Init...\n");
 		//Cycle the reset pin
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
 		HAL_Delay(250);
@@ -43,7 +44,10 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 		// Confirm the chip responded with a valid version
 		if (enc28j60_rev > 0) {
+			printf("MAC Hardware Init Success.\n");
 			xReturn = pdPASS;
+		} else {
+			printf("MAC Hardware Init FAIL!\n");
 		}
 	}
 

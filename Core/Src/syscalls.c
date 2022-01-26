@@ -30,6 +30,13 @@
 #include <sys/time.h>
 #include <sys/times.h>
 
+#include "main.h"
+#include <sys/stat.h>
+
+#define STDIN_FILENO  0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+
 
 /* Variables */
 extern int __io_putchar(int ch) __attribute__((weak));
@@ -38,6 +45,16 @@ extern int __io_getchar(void) __attribute__((weak));
 
 char *__env[1] = { 0 };
 char **environ = __env;
+
+UART_HandleTypeDef *gHuart;
+
+void RetargetInit(UART_HandleTypeDef *huart) {
+  gHuart = huart;
+
+  /* Disable I/O buffering for STDOUT stream, so that
+   * chars are sent out as soon as they are printed. */
+  setvbuf(stdout, NULL, _IONBF, 0);
+}
 
 
 /* Functions */
@@ -62,49 +79,74 @@ void _exit (int status)
 	while (1) {}		/* Make sure we hang here */
 }
 
-__attribute__((weak)) int _read(int file, char *ptr, int len)
+__attribute__((weak)) int _read(int fd, char *ptr, int len)
 {
-	int DataIdx;
+	  HAL_StatusTypeDef hstatus;
 
-	for (DataIdx = 0; DataIdx < len; DataIdx++)
-	{
-		*ptr++ = __io_getchar();
-	}
-
-return len;
+	  if (fd == STDIN_FILENO) {
+	    hstatus = HAL_UART_Receive(gHuart, (uint8_t *) ptr, 1, HAL_MAX_DELAY);
+	    if (hstatus == HAL_OK)
+	      return 1;
+	    else
+	      return EIO;
+	  }
+	  errno = EBADF;
+	  return -1;
 }
 
-__attribute__((weak)) int _write(int file, char *ptr, int len)
+__attribute__((weak)) int _write(int fd, char *ptr, int len)
 {
-	int DataIdx;
+	  HAL_StatusTypeDef hstatus;
 
-	for (DataIdx = 0; DataIdx < len; DataIdx++)
-	{
-		__io_putchar(*ptr++);
-	}
-	return len;
+	  if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+	    hstatus = HAL_UART_Transmit(gHuart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+	    if (hstatus == HAL_OK)
+	      return len;
+	    else
+	      return EIO;
+	  }
+	  errno = EBADF;
+	  return -1;
 }
 
-int _close(int file)
+int _close(int fd)
 {
-	return -1;
+	  if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+	    return 0;
+
+	  errno = EBADF;
+	  return -1;
 }
 
 
-int _fstat(int file, struct stat *st)
+int _fstat(int fd, struct stat *st)
 {
-	st->st_mode = S_IFCHR;
-	return 0;
+	  if (fd >= STDIN_FILENO && fd <= STDERR_FILENO) {
+	    st->st_mode = S_IFCHR;
+	    return 0;
+	  }
+
+	  errno = EBADF;
+	  return 0;
 }
 
-int _isatty(int file)
+int _isatty(int fd)
 {
-	return 1;
+	  if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+	    return 1;
+
+	  errno = EBADF;
+	  return 0;
 }
 
-int _lseek(int file, int ptr, int dir)
+int _lseek(int fd, int ptr, int dir)
 {
-	return 0;
+	  (void) fd;
+	  (void) ptr;
+	  (void) dir;
+
+	  errno = EBADF;
+	  return -1;
 }
 
 int _open(char *path, int flags, ...)
