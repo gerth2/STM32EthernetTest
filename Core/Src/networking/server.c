@@ -324,11 +324,11 @@ RecData_runServer(RecData* rd, ConnData* cd, WssProtocolHandshake* wph)
          }
          else /* timeout (Ref-D) */
          {
-            if(rd->authenticated && clientSendPeriodic(cd))
+            if(clientSendPeriodic(cd))
                break; /* on sock error */
          }
+         vTaskDelay(100);
       }
-      rd->authenticated=FALSE;
       xprintf(("Closing WS connection: ecode = %d\n",rc));
    }
 }
