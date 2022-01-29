@@ -1,6 +1,5 @@
 #include "server.h"
-
-
+#include "FreeRTOS_IP_Private.h"
 
 //////////////////////////////////
 // Minnowserver interface
@@ -51,7 +50,7 @@ SendData_wsSendJSON(BufPrint* bp, int sizeRequired)
    ms = (MS*)BufPrint_getUserData(bp);
    if( ! o->committed )
    {
-      xprintf(("ERR: WebSocket send buffer too small\n"));
+      xprintf(("[SERVER] ERROR: WebSocket send buffer too small\n"));
       baAssert(0);/* This is a 'design' error */
       return -1;
    }
@@ -64,7 +63,7 @@ SendData_wsSendJSON(BufPrint* bp, int sizeRequired)
       bp->buf[bp->cursor++] = ' '; /* cursor is current bufsize */
    if(MS_sendText(ms, bp->cursor) < 0)
    {
-      xprintf(("WebSocket connection closed on send\n"));
+      xprintf(("[SERVER] WebSocket connection closed on send\n"));
       return -1;
    }
    return 0;
@@ -174,7 +173,7 @@ RecData_manageBinFrame(RecData* o,ConnData* cd, U8* data, int len,BaBool eom)
       case BinMsg_UploadEOF:
           // TODO define and handle various messages
       default:
-         xprintf(("Received unknown binary message: %u\n",(unsigned)data[0]));
+         xprintf(("[SERVER] Received unknown binary message: %u\n",(unsigned)data[0]));
    }
    if(eom)
       o->binMsg = 0; /* Reset */
@@ -210,7 +209,7 @@ RecData_openMessage(RecData* o, ConnData* cd)
    }
    else
    {
-      xprintf(("Semantic JSON message error\n"));
+      xprintf(("[SERVER] Semantic JSON message error\n"));
    }
    return -1;
 }
@@ -237,7 +236,7 @@ RecData_parse(RecData* o,ConnData* cd,U8* data,int len,BaBool eom)
    {
       if(status < 0 || ! eom)
       {
-         xprintf(("JSON: %s\n",status<0 ? "parse error":"expected end of MSG"));
+         xprintf(("[SERVER] JSON: %s\n",status<0 ? "parse error":"expected end of MSG"));
          return -1;
       }
       /* Got a JSON message */
@@ -245,7 +244,7 @@ RecData_parse(RecData* o,ConnData* cd,U8* data,int len,BaBool eom)
    }
    else if(eom)
    {
-      xprintf(("Expected more JSON"));
+      xprintf(("[SERVER] Expected more JSON"));
    }
    return 0; /* OK, but need more data */
 }
@@ -327,9 +326,8 @@ RecData_runServer(RecData* rd, ConnData* cd, WssProtocolHandshake* wph)
             if(clientSendPeriodic(cd))
                break; /* on sock error */
          }
-         vTaskDelay(100);
       }
-      xprintf(("Closing WS connection: ecode = %d\n",rc));
+      xprintf(("[SERVER] Closing WS connection: ecode = %d\n",rc));
    }
 }
 
@@ -342,7 +340,7 @@ static int openServerSock(SOCKET* sock)
    status = se_bind(sock, port);
    if(!status)
    {
-      xprintf(("WebSocket server listening on %d\n", (int)port));
+      xprintf(("[SERVER] WebSocket server listening on %d\n", (int)port));
    }
    return status;
 }
@@ -366,13 +364,19 @@ void serverInit(void){
       return;
    }
 
-	//MS_setSocket(&ms, sockPtr, msBuf.rec, sizeof(msBuf.rec), msBuf.send, sizeof(msBuf.send));
-	//RecData_runServer(&rd, &cd, &wph);
-
 	serverIsRunning = TRUE;
 }
 
+uint8_t clientConnected = FALSE;
+
 void serverUpdate(void){
+
+	if(clientConnected){
+		//Check if the fin/ack sequence has ended.
+		//Assume for now it has
+		clientConnected = FALSE;
+		se_close(sockPtr);
+	}
 
 	if(serverIsRunning){
 		switch(se_accept(&listenSockPtr, 50, &sockPtr))
@@ -380,8 +384,8 @@ void serverUpdate(void){
 		 case 1: /* Accepted new client connection i.e. new browser conn. */
 
 			MS_setSocket(&ms, sockPtr, msBuf.rec, sizeof(msBuf.rec), msBuf.send, sizeof(msBuf.send));
+			clientConnected = TRUE;
 			RecData_runServer(&rd, &cd, &wph);
-			se_close(sockPtr);
 
 		 break;
 
@@ -391,6 +395,7 @@ void serverUpdate(void){
 		 default:
 			/* We get here if 'accept' fails. This is probably where you reboot. */
 			se_close(listenSockPtr);
+			serverShutdown();
 			return; /* Must do system reboot */ //TODO actually reboot?
 		}
 	}

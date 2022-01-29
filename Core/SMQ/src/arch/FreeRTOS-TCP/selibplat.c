@@ -14,8 +14,10 @@ void se_close(SOCKET* sock)
 
    if(*sock != FREERTOS_INVALID_SOCKET)
    {
+	  printf("[MINNOWSERVER INF] Starting socket close...\n");
       FreeRTOS_shutdown(*sock, FREERTOS_SHUT_RDWR);
       start_time = xTaskGetTickCount();
+
 
       do
       {
@@ -28,6 +30,7 @@ void se_close(SOCKET* sock)
 
       FreeRTOS_closesocket(*sock);
       *sock=FREERTOS_INVALID_SOCKET;
+      printf("[MINNOWSERVER INF] Socket Close Completed.\n");
    }
 }
 
@@ -35,6 +38,9 @@ int se_bind(SOCKET* sock, uint16_t port)
 {
    struct freertos_sockaddr addr;
    socklen_t addrlen=sizeof(addr);
+
+   printf("[MINNOWSERVER INF] Binding socket to port %d\n", port);
+
    *sock = FreeRTOS_socket(
       FREERTOS_AF_INET, FREERTOS_SOCK_STREAM, FREERTOS_IPPROTO_TCP );
    if(*sock == FREERTOS_INVALID_SOCKET)
@@ -53,6 +59,7 @@ int se_bind(SOCKET* sock, uint16_t port)
       se_close(sock);
       return -2;
    }
+   printf("[MINNOWSERVER INF] Socket Bind Success\n", port);
    return 0;
 }
 
@@ -60,6 +67,9 @@ int se_connect(SOCKET* sock, const char* address, uint16_t port)
 {
    struct freertos_sockaddr addr;
    socklen_t addrlen=sizeof(addr);
+
+   printf("[MINNOWSERVER INF] Socket Connect on port %d started\n", port);
+
    uint32_t ip = FreeRTOS_gethostbyname(address);
    if( ! ip )
    {
@@ -87,6 +97,8 @@ int se_connect(SOCKET* sock, const char* address, uint16_t port)
       se_close(sock);
       return -3;
    }
+
+   printf("[MINNOWSERVER INF] Socket Connect Success\n");
    return 0;
 }
 
@@ -99,7 +111,14 @@ int se_accept(SOCKET** listenSock, U32 timeout, SOCKET** outSock)
    tickTmo = timeout==INFINITE_TMO ? portMAX_DELAY : timeout/portTICK_PERIOD_MS;
    FreeRTOS_setsockopt(**listenSock,0,FREERTOS_SO_RCVTIMEO,&tickTmo,0);
    **outSock=FreeRTOS_accept(**listenSock,&addr,&addrlen);
-   return **outSock == 0 ? 0 : (**outSock < 0 ? -1 : 1);
+
+   int retval = **outSock == 0 ? 0 : (**outSock < 0 ? -1 : 1);
+
+   if(retval > 0){
+	   printf("[MINNOWSERVER INF] Socket Accept occurred\n");
+   }
+
+   return retval;
 }
 
 

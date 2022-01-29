@@ -304,7 +304,7 @@ MS_webServer(MS* o, WssProtocolHandshake* wph)
    {
       if( (rc = MST_read(&o->mst,&rbuf,100)) <= 0 )
       {
-         xprintf(("HTTP request header error: %s.\n",
+         xprintf(("[MS WEBSERVER] HTTP request header error: %s.\n",
                   rc == 0 ? "timeout" : "connection closed"));
          return rc == 0 ? MS_ERR_READ_TMO :  MS_ERR_READ;
       }
@@ -315,7 +315,7 @@ MS_webServer(MS* o, WssProtocolHandshake* wph)
          sbuf = ptr = MS_prepSend(o, FALSE, &sblen);
       if(sblen < rc)
       {
-         xprintf(("HTTP request header too big\n"));
+         xprintf(("[MS WEBSERVER]HTTP request header too big\n"));
          return MS_ERR_HTTP_HEADER_OVERFLOW;
       }
       memcpy(ptr,rbuf,rc);
@@ -353,7 +353,7 @@ MS_webServer(MS* o, WssProtocolHandshake* wph)
    }
    if(!wph->request)
    {
-      xprintf(("Cannot validate HTTP request header\n"));
+      xprintf(("[MS WEBSERVER]Cannot validate HTTP request header\n"));
       return MS_ERR_INVALID_HTTP;
    }
    for(i = 0; i < hIx; i++)

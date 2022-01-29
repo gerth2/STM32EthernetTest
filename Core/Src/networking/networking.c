@@ -28,7 +28,7 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 	if(spiHandle != NULL){
 
-		printf("Starting MAC Init...\n");
+		printf("[HARDWARE] Starting MAC Init...\n");
 		//Cycle the reset pin
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
 		HAL_Delay(250);
@@ -44,10 +44,10 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 		// Confirm the chip responded with a valid version
 		if (enc28j60_rev > 0) {
-			printf("MAC Hardware Init Success.\n");
+			printf("[HARDWARE] MAC Init Success.\n");
 			xReturn = pdPASS;
 		} else {
-			printf("MAC Hardware Init FAIL!\n");
+			printf("[HARDWARE] MAC Init FAIL!\n");
 		}
 	}
 
@@ -162,7 +162,7 @@ void handlePackets(void)
 #define SERVER_SHUTDOWN 2
 uint8_t serverStatus = SERVER_NOCHANGE;
 
-void HttpserverTask( void *pvParameters );
+//void HttpserverTask( void *pvParameters );
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
     if( eNetworkEvent == eNetworkUp )
@@ -170,10 +170,12 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 		//FreeRTOS_printf("vApplicationIP: network up.\n");
 		//TODO - specific tasks like start servers and whatnot when the network goes up?
     	serverStatus = SERVER_INIT;
+    	printf("[HARDWARE] Network UP\n");
 
     } else if ( eNetworkEvent == eNetworkDown) {
     	//FreeRTOS_printf("vApplicationIP: network down.\n");
     	serverStatus = SERVER_SHUTDOWN;
+    	printf("[HARDWARE] Network DOWN\n");
     }
 }
 
@@ -189,11 +191,13 @@ void vApplicationPingReplyHook( ePingReplyStatus_t eStatus, uint16_t usIdentifie
             RTOS task - blocking in this function will block the TCP/IP RTOS task. */
             //xQueueSend( xPingReplyQueue, &usIdentifier, 10 / portTICK_PERIOD_MS );
         	//TODO - no idea how this is used or if it matters
+        	printf("[HARDWARE] Ping response success\n");
             break;
 
         case eInvalidChecksum :
         case eInvalidData :
             /* A reply was received but it was not valid. */
+        	printf("[HARDWARE] Ping response failure\n");
             break;
     }
 }
@@ -220,11 +224,13 @@ uint32_t ulApplicationGetNextSequenceNumber( uint32_t ulSourceAddress,
 void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
 	spiHandle = spiHandle_in;
     /* Initialise the TCP/IP stack. */
+	printf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
     FreeRTOS_IPInit( ucIPAddress,
                      ucNetMask,
                      ucGatewayAddress,
                      ucDNSServerAddress,
                      ucMACAddress );
+    printf("[HARDWARE] FreeRTOS TCP-IP Stack Init Complete\n");
 }
 
 void NetworkingPeriodic() {

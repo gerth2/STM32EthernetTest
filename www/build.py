@@ -55,10 +55,12 @@ if __name__ == "__main__":
             switchyard += "      dptr={};\n".format(file.codeName)
             switchyard += "      size=sizeof({});\n".format(file.codeName)
             switchyard += "      egz=egz_{};\n".format(file.mimeType)
+            switchyard += "      printf(\"[WEBSERVER] Serving {}\\n\");\n".format(file.url)
             switchyard += "   } "
 
         switchyard += "else {\n"
         switchyard += "      //URL Not found\n"
+        switchyard += "      printf(\"[WEBSERVER] Could not find requested resource!\\n\");\n"
         switchyard += "      return 0;\n"
         switchyard += "   } \n\n"
 
