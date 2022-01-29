@@ -7,7 +7,7 @@ webSocket = new WebSocket(url);
 
 webSocket.onopen = function (event) {
 	console.log("Opened!")
-	webSocket.send("Here's some text that the server is urgently awaiting!");
+	//webSocket.send("Here's some text that the server is urgently awaiting!");
 };
 
 webSocket.onmessage = function (event) {

@@ -48,9 +48,14 @@ SendData_wsSendJSON(BufPrint* bp, int sizeRequired)
    (void)sizeRequired; /* not used */
    /* From SendData_constructor >  BufPrint_setBuf */
    ms = (MS*)BufPrint_getUserData(bp);
+
+   printf("[WEBSOCKETS] Sending JSON \"");
+   fwrite(ms->mst.b.sendBuf+4, 1, bp->cursor, stdout);
+   printf("\"\n");
+
    if( ! o->committed )
    {
-      xprintf(("[SERVER] ERROR: WebSocket send buffer too small\n"));
+      printf("[WEBSOCKETS] ERROR: WebSocket send buffer too small\n");
       baAssert(0);/* This is a 'design' error */
       return -1;
    }
@@ -63,7 +68,7 @@ SendData_wsSendJSON(BufPrint* bp, int sizeRequired)
       bp->buf[bp->cursor++] = ' '; /* cursor is current bufsize */
    if(MS_sendText(ms, bp->cursor) < 0)
    {
-      xprintf(("[SERVER] WebSocket connection closed on send\n"));
+      printf("[WEBSOCKETS] WebSocket connection closed on send\n");
       return -1;
    }
    return 0;
@@ -173,7 +178,7 @@ RecData_manageBinFrame(RecData* o,ConnData* cd, U8* data, int len,BaBool eom)
       case BinMsg_UploadEOF:
           // TODO define and handle various messages
       default:
-         xprintf(("[SERVER] Received unknown binary message: %u\n",(unsigned)data[0]));
+         printf("[SERVER] Received unknown binary message: %u\n",(unsigned)data[0]);
    }
    if(eom)
       o->binMsg = 0; /* Reset */
@@ -209,7 +214,7 @@ RecData_openMessage(RecData* o, ConnData* cd)
    }
    else
    {
-      xprintf(("[SERVER] Semantic JSON message error\n"));
+      printf("[SERVER] Semantic JSON message error\n");
    }
    return -1;
 }
@@ -236,7 +241,7 @@ RecData_parse(RecData* o,ConnData* cd,U8* data,int len,BaBool eom)
    {
       if(status < 0 || ! eom)
       {
-         xprintf(("[SERVER] JSON: %s\n",status<0 ? "parse error":"expected end of MSG"));
+         printf("[SERVER] JSON: %s\n",status<0 ? "parse error":"expected end of MSG");
          return -1;
       }
       /* Got a JSON message */
@@ -244,7 +249,7 @@ RecData_parse(RecData* o,ConnData* cd,U8* data,int len,BaBool eom)
    }
    else if(eom)
    {
-      xprintf(("[SERVER] Expected more JSON"));
+      printf("[SERVER] Expected more JSON");
    }
    return 0; /* OK, but need more data */
 }
@@ -269,7 +274,7 @@ static int clientSendPeriodic(ConnData* cd)
 {
    //Returns 0 if all sends to client were ok (and we should keep talking to the client),
    // or -1 if any sends failed (and we should probably disconnect)
-   return sendSampleMessage(cd, 42.0);
+   return sendSampleMessage(cd, rand()%125);
 }
 
 
@@ -294,14 +299,17 @@ RecData_runServer(RecData* rd, ConnData* cd, WssProtocolHandshake* wph)
 {
    MS* ms=cd->u.ms;
    /* MS_webServer: Manage HTTP GET or upgrade WebSocket request */
-   if( ! MS_webServer(ms,wph) && ! sendDeviceName(cd))
+   if( ! MS_webServer(ms,wph))
    { /* We get here if HTTP(S) was upgraded to a WebSocket con. */
       int rc;
       U8* msg;
       /* We send the nonce to the browser so the user can
        * safely authenticate.
        */
-      RecData_sendNonce(rd, cd);
+      vTaskDelay(500);
+      sendDeviceName(cd);
+      vTaskDelay(500);
+      //RecData_sendNonce(rd, cd);
       while((rc=MS_read(ms,&msg,50)) >= 0)
       {
          if(rc) /* incomming data from browser */
@@ -326,8 +334,9 @@ RecData_runServer(RecData* rd, ConnData* cd, WssProtocolHandshake* wph)
             if(clientSendPeriodic(cd))
                break; /* on sock error */
          }
+         vTaskDelay(500);
       }
-      xprintf(("[SERVER] Closing WS connection: ecode = %d\n",rc));
+      printf("[SERVER] Closing WS connection: ecode = %d\n",rc);
    }
 }
 
@@ -340,7 +349,7 @@ static int openServerSock(SOCKET* sock)
    status = se_bind(sock, port);
    if(!status)
    {
-      xprintf(("[SERVER] WebSocket server listening on %d\n", (int)port));
+      printf("[SERVER] WebSocket server listening on %d\n", (int)port);
    }
    return status;
 }

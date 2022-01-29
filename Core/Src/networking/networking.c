@@ -28,8 +28,9 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 	if(spiHandle != NULL){
 
-		printf("[HARDWARE] Starting MAC Init...\n");
+
 		//Cycle the reset pin
+		printf("[HARDWARE] Resetting MAC Hardware...\n");
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
 		HAL_Delay(250);
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
@@ -37,6 +38,7 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 
 		// Init the Hardwaare
+		printf("[HARDWARE] Starting MAC Init...\n");
 		ES_enc28j60SpiInit(spiHandle);
 		ES_enc28j60Init(ucMACAddress);
 
@@ -44,6 +46,7 @@ BaseType_t xNetworkInterfaceInitialise( void )
 
 		// Confirm the chip responded with a valid version
 		if (enc28j60_rev > 0) {
+			printf("[HARDWARE] Found ENC28J60 device Revision %d\n", enc28j60_rev);
 			printf("[HARDWARE] MAC Init Success.\n");
 			xReturn = pdPASS;
 		} else {
@@ -203,17 +206,18 @@ void vApplicationPingReplyHook( ePingReplyStatus_t eStatus, uint16_t usIdentifie
 }
 
 BaseType_t xApplicationGetRandomNumber( uint32_t * pulNumber ){
-	*pulNumber = 0x00000004; // Chosen by a dice roll
-	// TODO make this actually crypto secure by reading from an analog input or whatevs?
+	*pulNumber = rand();
 	return pdTRUE;
 }
+
+uint32_t seqNumCounter = 42;
 
 uint32_t ulApplicationGetNextSequenceNumber( uint32_t ulSourceAddress,
                                              uint16_t usSourcePort,
                                              uint32_t ulDestinationAddress,
                                              uint16_t usDestinationPort ){
-	// TODO make this actually crypto secure by reading from an analog input or whatevs?
-	return 0x00000004;
+
+    return (seqNumCounter++ ^ ulSourceAddress ^ usSourcePort ^ ulDestinationAddress ^ usDestinationPort) + 1;
 }
 
 
