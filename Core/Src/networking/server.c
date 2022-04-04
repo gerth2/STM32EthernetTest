@@ -3,18 +3,20 @@
 
 uint8_t serverIsRunning = 0;
 
-static const char *s_debug_level = "4";
+static const char *s_debug_level = "3";
 static const char *s_listening_address = "http://0.0.0.0:5800";
 struct mg_mgr mgr;
+
+//Forward declaraton from autogen file
+void handleHttpFileServe(struct mg_connection *c, void * ev_data);
 
 
 // Event handler for the listening connection.
 static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
-    mg_http_reply(c, 200, "", "hello, %s!\n", "world");
+	  handleHttpFileServe(c, ev_data);
   }
   (void) fn_data;
-  (void) ev_data;
 }
 
 

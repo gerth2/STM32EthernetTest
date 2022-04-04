@@ -19,15 +19,11 @@ class FileContents():
         self.mimeType = tmp[1].replace(".", "")
 
         with open(self.sourceFile, "r") as infile:
-            self.fileContentsStr = infile.read().encode("utf-8")
-            self.compressedBytes = gzip.compress(self.fileContentsStr)
+            self.fileContentsStr = json.dumps(infile.read())
 
-    def getCompressedDeclaration(self):
-        return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join([hex(x) for x in self.compressedBytes]))
 
     def getDeclaration(self):
-        #return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join(["\'{}\'".format(char) for char in json.dumps(self.fileContentsStr).strip("\"").replace("\"", "\\\"").replace("\'", "\\\'")]))
-        return "static const U8 {}[] = {{ {} }};".format(self.codeName, ", ".join([hex(x) for x in self.fileContentsStr]))
+        return "static const char {}[] = {};".format(self.codeName, self.fileContentsStr)
 
 
 if __name__ == "__main__":
@@ -46,22 +42,21 @@ if __name__ == "__main__":
         first = True
         switchyard = ""
         for file in src_file_list:
-            if(first):
-                switchyard += "   if(strcmp(path, \"{}\") == 0) {{\n".format(file.url)
+            if(first): 
+                switchyard += "if(mg_http_match_uri(hm, \"{}\")) {{\n".format(file.url)
                 first = False
             else:
-                switchyard += "else if(strcmp(path, \"{}\") == 0) {{\n".format(file.url)
+                switchyard += "else if(mg_http_match_uri(hm, \"{}\")) {{\n".format(file.url)
 
-            switchyard += "      dptr={};\n".format(file.codeName)
-            switchyard += "      size=sizeof({});\n".format(file.codeName)
-            switchyard += "      egz=egz_{};\n".format(file.mimeType)
-            switchyard += "      printf(\"[WEBSERVER] Serving {}\\n\");\n".format(file.url)
+            switchyard += "      mg_http_reply(c, 200,  header_{},  {} );\n".format(file.mimeType ,file.codeName)
+            switchyard += "      printf(\"[WEBSERVER] Served {}\\n\");\n".format(file.url)
+
             switchyard += "   } "
 
         switchyard += "else {\n"
         switchyard += "      //URL Not found\n"
         switchyard += "      printf(\"[WEBSERVER] Could not find requested resource!\\n\");\n"
-        switchyard += "      return 0;\n"
+        switchyard += "      mg_http_reply(c, 404,  header_html,  FourOhFour_html );\n".format(file.mimeType ,file.codeName)
         switchyard += "   } \n\n"
 
 
