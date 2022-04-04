@@ -12,6 +12,10 @@
 void NetworkingInit(SPI_HandleTypeDef * spiHandle);
 void NetworkingPeriodic(void);
 
+#define SERVER_NOCHANGE 0
+#define SERVER_INIT 1
+#define SERVER_SHUTDOWN 2
+extern uint8_t serverStatus;
 
 
 #ifndef PSTR

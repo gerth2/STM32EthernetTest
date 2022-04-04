@@ -160,25 +160,18 @@ void handlePackets(void)
 }
 
 
-#define SERVER_NOCHANGE 0
-#define SERVER_INIT 1
-#define SERVER_SHUTDOWN 2
+
 uint8_t serverStatus = SERVER_NOCHANGE;
 
 //void HttpserverTask( void *pvParameters );
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
-    if( eNetworkEvent == eNetworkUp )
-    {
-		//FreeRTOS_printf("vApplicationIP: network up.\n");
-		//TODO - specific tasks like start servers and whatnot when the network goes up?
-    	serverStatus = SERVER_INIT;
+    if( eNetworkEvent == eNetworkUp ) {
     	printf("[HARDWARE] Network UP\n");
-
+    	serverStatus = SERVER_INIT;
     } else if ( eNetworkEvent == eNetworkDown) {
-    	//FreeRTOS_printf("vApplicationIP: network down.\n");
-    	serverStatus = SERVER_SHUTDOWN;
     	printf("[HARDWARE] Network DOWN\n");
+    	serverStatus = SERVER_SHUTDOWN;
     }
 }
 

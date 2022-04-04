@@ -414,7 +414,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = SPI1_ETH_CS_Pin|ETH_RESET_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : GPIO_LED_Pin */
@@ -462,7 +462,6 @@ void StartTask_10ms(void *argument)
 	TickType_t xLastWakeTime;
 	const TickType_t xFrequency = (TickType_t) round(0.010 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
-	serverInit();
 	printf("[MAIN] Starting 10ms task\n");
 
 
@@ -472,6 +471,7 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 
 		//LEDBlinkerPeriodic();
+		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
@@ -524,7 +524,6 @@ void StartTask_Server(void *argument)
   for(;;)
   {
 	serverUpdate();
-	NetworkingPeriodic();
     vTaskDelay(1);
   }
   /* USER CODE END StartTask_Server */
