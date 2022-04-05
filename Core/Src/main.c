@@ -471,7 +471,6 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 
 		//LEDBlinkerPeriodic();
-		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
@@ -523,6 +522,7 @@ void StartTask_Server(void *argument)
 
   for(;;)
   {
+	NetworkingPeriodic();
 	serverUpdate();
     vTaskDelay(1);
   }
@@ -559,8 +559,11 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
-	while (1) {
-	}
+    NVIC_SystemReset();
+    while (1)
+    {
+
+    }
   /* USER CODE END Error_Handler_Debug */
 }
 

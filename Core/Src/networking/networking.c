@@ -32,9 +32,9 @@ BaseType_t xNetworkInterfaceInitialise( void )
 		//Cycle the reset pin
 		printf("[HARDWARE] Resetting MAC Hardware...\n");
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
-		HAL_Delay(250);
+		HAL_Delay(100);
 		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
-		HAL_Delay(250);
+		HAL_Delay(100);
 
 
 		// Init the Hardwaare

@@ -43,7 +43,7 @@ void serverUpdate(void){
 	}
 
 	if(serverIsRunning){
-		mg_mgr_poll(&mgr, 10);   // Event loop
+		mg_mgr_poll(&mgr, 1000);   // Event loop
 	}
 }
 
