@@ -9,10 +9,8 @@ $pageData
 
 // Auto-Generated page response handler.
 // Returns poiner to requested content, or null if not available.
-void handleHttpFileServe(struct mg_connection *c, void * ev_data)
+void handleHttpFileServe(struct mg_connection *c, struct mg_http_message * hm)
 {
-
-   struct mg_http_message *hm = (struct mg_http_message *) ev_data;
 
    $pageSwitchyard
 
