@@ -2,7 +2,7 @@ function myFunction() {
 	document.getElementById("demo").style.color = "red";
 }
 
-url = "ws://" + window.location.hostname + "/websocket"
+url = "ws://" + window.location.hostname +":" + window.location.port + "/websocket"
 webSocket = new WebSocket(url);
 
 webSocket.onopen = function (event) {
