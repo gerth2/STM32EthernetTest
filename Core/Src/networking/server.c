@@ -1,10 +1,10 @@
 #include "server.h"
-#include "FreeRTOS_IP_Private.h"
+
 
 uint8_t serverIsRunning = 0;
 
 static const char *s_debug_level = "3";
-static const char *s_listening_address = "ws://0.0.0.0:5800";
+static const char *s_listening_address = "ws://0.0.0.0:5800"; //not sure if the prefix matters or not, but his is both for http and ws currently
 struct mg_mgr mgr;
 
 //Forward declaraton from autogen file
@@ -19,6 +19,8 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 			// Upgrade to websocket. From now on, a connection is a full-duplex
 			// Websocket connection, which will receive MG_EV_WS_MSG events.
 			mg_ws_upgrade(c, hm, NULL);
+		    printf("[WEBSERVER] Upgrade to Websocket");
+
 		} else {
 			handleHttpFileServe(c, hm);
 		}
@@ -30,6 +32,35 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
 
 	(void) fn_data;
+}
+
+void periodicWSDataSend(void){
+
+	struct mg_connection *c = mgr.conns;
+
+	//Create the message to tx
+	char txString[256];
+	double curTime = getCurTime();
+	double testVal = 10 + 5.0 * sin(2 * 3.41459 * 0.5 * curTime);
+	int strlen;
+
+	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%lf}",curTime, testVal);
+
+
+	//For all connections in list...
+	while(c != NULL){
+
+		if(c->is_websocket){
+			//For all websockets, send the data
+			mg_ws_send(c, txString, strlen, WEBSOCKET_OP_TEXT);
+		    printf("[WEBSERVER] Periodic Data Send");
+
+		}
+
+
+		c = c->next; //move on to next connection
+	}
+
 }
 
 void serverInit(void) {
@@ -55,6 +86,7 @@ void serverUpdate(void) {
 
 	if (serverIsRunning) {
 		mg_mgr_poll(&mgr, 1000);   // Event loop
+		periodicWSDataSend();
 	}
 }
 
