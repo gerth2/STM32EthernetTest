@@ -2,18 +2,10 @@
 #define __ENC28J60_H
 
 #include "stm32includes.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "main.h"
 #define Delay HAL_Delay
-
-/*
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-static inline void uDelay(uint32_t useconds) {
-	volatile int cycleCount = ?
-	while (cycleCount--);
-}
-#pragma GCC pop_options
-*/
 
 #ifndef ETHERNET_LED_GPIO
 //#	error Please define ETHERNET_LED_GPIO, for example by gcc option -DETHERNET_LED_GPIO=GPIOA
@@ -50,8 +42,6 @@ static inline void uDelay(uint32_t useconds) {
 #define enableChip   ETHERNET_CS_GPIO->BSRR = ETHERNET_CS_PIN<<16;\
 	ETHERNET_LED_GPIO->BSRR = ETHERNET_LED_PIN;\
 	ETHERNET_CS_DELAY_PROC;
-//#define disableChip  {}
-//#define enableChip   {}
 
 
 // ENC28J60 Control Registers
@@ -291,8 +281,6 @@ static inline void uDelay(uint32_t useconds) {
 #define        MAX_FRAMELEN        1500        // (note: maximum ethernet frame length would be 1518)
 //#define MAX_FRAMELEN     600
 
-//void ENC28J60_SPI1_Configuration(void);
-//void ENC28J60_GPIO_Configuration(void);
 void enc28j60_set_spi(SPI_HandleTypeDef *hspi_new);
 unsigned char ENC28J60_SendByte(unsigned char dt);
 uint8_t enc28j60ReadOp(uint8_t op, uint8_t address);

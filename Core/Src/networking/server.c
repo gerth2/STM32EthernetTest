@@ -19,7 +19,6 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 			// Upgrade to websocket. From now on, a connection is a full-duplex
 			// Websocket connection, which will receive MG_EV_WS_MSG events.
 			mg_ws_upgrade(c, hm, NULL);
-		    printf("[WEBSERVER] Upgrade to Websocket");
 
 		} else {
 			handleHttpFileServe(c, hm);
@@ -53,8 +52,6 @@ void periodicWSDataSend(void){
 		if(c->is_websocket){
 			//For all websockets, send the data
 			mg_ws_send(c, txString, strlen, WEBSOCKET_OP_TEXT);
-		    printf("[WEBSERVER] Periodic Data Send");
-
 		}
 
 

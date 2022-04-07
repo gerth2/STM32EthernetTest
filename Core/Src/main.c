@@ -19,12 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "LEDBlinker.h"
-#include "gamepad.h"
 #include "networking.h"
 #include "server.h"
 #include <math.h>
@@ -55,6 +53,8 @@ TIM_HandleTypeDef htim11;
 
 UART_HandleTypeDef huart1;
 
+PCD_HandleTypeDef hpcd_USB_OTG_FS;
+
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 uint32_t defaultTaskBuffer[ 128 ];
@@ -65,7 +65,7 @@ const osThreadAttr_t defaultTask_attributes = {
   .cb_size = sizeof(defaultTaskControlBlock),
   .stack_mem = &defaultTaskBuffer[0],
   .stack_size = sizeof(defaultTaskBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for task_10ms */
 osThreadId_t task_10msHandle;
@@ -77,7 +77,7 @@ const osThreadAttr_t task_10ms_attributes = {
   .cb_size = sizeof(task_10msControlBlock),
   .stack_mem = &task_10msBuffer[0],
   .stack_size = sizeof(task_10msBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for task_500ms */
 osThreadId_t task_500msHandle;
@@ -101,7 +101,7 @@ const osThreadAttr_t task_Server_attributes = {
   .cb_size = sizeof(task_ServerControlBlock),
   .stack_mem = &task_ServerBuffer[0],
   .stack_size = sizeof(task_ServerBuffer),
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
 
@@ -114,6 +114,7 @@ static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM11_Init(void);
+static void MX_USB_OTG_FS_PCD_Init(void);
 void StartDefaultTask(void *argument);
 void StartTask_10ms(void *argument);
 void StartTask500ms(void *argument);
@@ -160,6 +161,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_TIM11_Init();
+  MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
   timeInit();
@@ -168,7 +170,6 @@ int main(void)
 
   printf("[MAIN] User Init Started...\n");
   //LEDBlinkerInit();
-  GamepadInit();
   NetworkingInit(&hspi1);
   printf("[MAIN] User Init Completed!\n");
 
@@ -428,6 +429,41 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
+  * @brief USB_OTG_FS Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USB_OTG_FS_PCD_Init(void)
+{
+
+  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
+
+  /* USER CODE END USB_OTG_FS_Init 0 */
+
+  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
+
+  /* USER CODE END USB_OTG_FS_Init 1 */
+  hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
+  hpcd_USB_OTG_FS.Init.dev_endpoints = 4;
+  hpcd_USB_OTG_FS.Init.speed = PCD_SPEED_FULL;
+  hpcd_USB_OTG_FS.Init.dma_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
+  hpcd_USB_OTG_FS.Init.Sof_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.lpm_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.vbus_sensing_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
+  if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
+
+  /* USER CODE END USB_OTG_FS_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -477,8 +513,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
-  /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
@@ -507,8 +541,7 @@ void StartTask_10ms(void *argument)
 	for (;;) {
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		/* 10mS Periodic Code START */
-
-		//LEDBlinkerPeriodic();
+		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
@@ -536,8 +569,6 @@ void StartTask500ms(void *argument)
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		/* 500mS Periodic Code START */
 
-		GamepadPeriodic();
-
 		/* 500mS Periodic Code END */
 
 	}
@@ -554,15 +585,19 @@ void StartTask500ms(void *argument)
 void StartTask_Server(void *argument)
 {
   /* USER CODE BEGIN StartTask_Server */
-  /* Infinite loop */
 
-  printf("[MAIN] Starting Server task\n");
+	TickType_t xLastWakeTime;
+	const TickType_t xFrequency = (TickType_t) round(0.10 * ((double) configTICK_RATE_HZ));
+	xLastWakeTime = xTaskGetTickCount();
+	printf("[MAIN] Starting Server task\n");
+
+	/* Infinite loop */
+
 
   for(;;)
   {
-	NetworkingPeriodic();
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	serverUpdate();
-    vTaskDelay(20);
   }
   /* USER CODE END StartTask_Server */
 }
