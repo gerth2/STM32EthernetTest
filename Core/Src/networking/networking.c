@@ -20,131 +20,37 @@ static uint8_t buf[BUFFER_SIZE + 1];
 
 static SPI_HandleTypeDef *spiHandle = NULL;
 
-BaseType_t xNetworkInterfaceInitialise(void) {
-	BaseType_t xReturn = pdFAIL;
 
-	if (spiHandle != NULL) {
+void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 
-		//Cycle the reset pin
-		printf("[HARDWARE] Resetting MAC Hardware...\n");
-		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
-		HAL_Delay(100);
-		HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
-		HAL_Delay(100);
-
-		// Init the Hardwaare
-		printf("[HARDWARE] Starting MAC Init...\n");
-		ES_enc28j60SpiInit(spiHandle);
-		ES_enc28j60Init(ucMACAddress);
-
-		uint8_t enc28j60_rev = ES_enc28j60Revision();
-
-		// Confirm the chip responded with a valid version
-		if (enc28j60_rev > 0) {
-			printf("[HARDWARE] Found ENC28J60 device Revision %d\n",
-					enc28j60_rev);
-			printf("[HARDWARE] MAC Init Success.\n");
-			xReturn = pdPASS;
-		} else {
-			printf("[HARDWARE] MAC Init FAIL!\n");
-		}
-	}
-
-	return xReturn;
+BaseType_t xNetworkInterfaceInitialise( void )
+{
+    extern uint8_t ucMACAddress[ 6 ];
+    if ( enc28j60_init(ucMACAddress) == 0 ) {
+        return pdPASS;
+    } else {
+        return pdFAIL;
+    }
 }
 
-BaseType_t xNetworkInterfaceOutput(
-		NetworkBufferDescriptor_t *const pxDescriptor,
-		BaseType_t xReleaseAfterSend) {
-	ES_enc28j60PacketSend(pxDescriptor->xDataLength,
-			pxDescriptor->pucEthernetBuffer);
+BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescriptor,
+                                    BaseType_t xReleaseAfterSend )
+{
+    enc28j60_send_packet(pxDescriptor->pucEthernetBuffer, pxDescriptor->xDataLength );
 
-	iptraceNETWORK_INTERFACE_TRANSMIT();
+    printf("FreeRTOS: Packet forwarded to driver for transmiting...\n");
+    /* Call the standard trace macro to log the send event. */
+    iptraceNETWORK_INTERFACE_TRANSMIT();
 
-	if (xReleaseAfterSend != pdFALSE) {
-		vReleaseNetworkBufferAndDescriptor(pxDescriptor);
-	}
+    if( xReleaseAfterSend != pdFALSE )
+    {
+        vReleaseNetworkBufferAndDescriptor( pxDescriptor );
+    }
 
-	return pdTRUE;
+    return pdTRUE;
 }
 
-/* The deferred interrupt handler is a standard RTOS task.  FreeRTOS's centralised
- deferred interrupt handling capabilities can also be used. */
-void handlePackets(void) {
-	NetworkBufferDescriptor_t *pxBufferDescriptor;
-	size_t xBytesReceived;
-	/* Used to indicate that xSendEventStructToIPTask() is being called because
-	 of an Ethernet receive event. */
-	xIPStackEvent_t xRxEvent;
 
-	do {
-
-		xBytesReceived = ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
-
-		if (xBytesReceived > 0) {
-			/* Allocate a network buffer descriptor that points to a buffer
-			 large enough to hold the received frame.  As this is the simple
-			 rather than efficient example the received data will just be copied
-			 into this buffer. */
-			pxBufferDescriptor = pxGetNetworkBufferWithDescriptor(
-					xBytesReceived, 0);
-
-			if (pxBufferDescriptor != NULL) {
-				/* pxBufferDescriptor->pucEthernetBuffer now points to an Ethernet
-				 buffer large enough to hold the received data.  Copy the
-				 received data into pcNetworkBuffer->pucEthernetBuffer.  Here it
-				 is assumed ReceiveData() is a peripheral driver function that
-				 copies the received data into a buffer passed in as the function's
-				 parameter.  Remember! While is is a simple robust technique -
-				 it is not efficient.  An example that uses a zero copy technique
-				 is provided further down this page. */
-				memcpy(pxBufferDescriptor->pucEthernetBuffer, buf,
-						xBytesReceived);
-				pxBufferDescriptor->xDataLength = xBytesReceived;
-
-				/* See if the data contained in the received Ethernet frame needs
-				 to be processed.  NOTE! It is preferable to do this in
-				 the interrupt service routine itself, which would remove the need
-				 to unblock this task for packets that don't need processing. */
-				if (eConsiderFrameForProcessing(
-						pxBufferDescriptor->pucEthernetBuffer)
-						== eProcessBuffer) {
-					/* The event about to be sent to the TCP/IP is an Rx event. */
-					xRxEvent.eEventType = eNetworkRxEvent;
-
-					/* pvData is used to point to the network buffer descriptor that
-					 now references the received data. */
-					xRxEvent.pvData = (void*) pxBufferDescriptor;
-
-					/* Send the data to the TCP/IP stack. */
-					if (xSendEventStructToIPTask(&xRxEvent, 0) == pdFALSE) {
-						/* The buffer could not be sent to the IP task so the buffer
-						 must be released. */
-						vReleaseNetworkBufferAndDescriptor(pxBufferDescriptor);
-
-						/* Make a call to the standard trace macro to log the
-						 occurrence. */
-						iptraceETHERNET_RX_EVENT_LOST();
-					} else {
-						/* The message was successfully sent to the TCP/IP stack.
-						 Call the standard trace macro to log the occurrence. */
-						iptraceNETWORK_INTERFACE_RECEIVE();
-					}
-				} else {
-					/* The Ethernet frame can be dropped, but the Ethernet buffer
-					 must be released. */
-					vReleaseNetworkBufferAndDescriptor(pxBufferDescriptor);
-				}
-			} else {
-				/* The event was lost because a network buffer was not available.
-				 Call the standard trace macro to log the occurrence. */
-				iptraceETHERNET_RX_EVENT_LOST();
-			}
-		}
-
-	} while (xBytesReceived > 0);
-
-}
 
 uint8_t serverStatus = SERVER_NOCHANGE;
 
@@ -209,6 +115,6 @@ void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
 }
 
 void NetworkingPeriodic() {
-	handlePackets();
+
 }
 

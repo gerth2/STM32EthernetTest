@@ -1,7 +1,7 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
-#include "EtherShield.h"
+#include "stm32f4xx_hal.h"
 
 #define NET_BUF_SIZE (1<<10)
 #define UART_BUF_SIZE (NET_BUF_SIZE << 2)

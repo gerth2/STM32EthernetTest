@@ -9,6 +9,8 @@
 #include "mongoose.h"
 #include "networking.h"
 #include "timeManager.h"
+#include "stm32f4xx_hal.h"
+
 
 
 /** Public API */
