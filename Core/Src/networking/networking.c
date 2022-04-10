@@ -18,15 +18,12 @@ static const uint8_t ucDNSServerAddress[4] = { 1, 1, 1, 1 };
 #define BUFFER_SIZE 550
 static uint8_t buf[BUFFER_SIZE + 1];
 
-static SPI_HandleTypeDef *spiHandle = NULL;
-
-
 void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 
 BaseType_t xNetworkInterfaceInitialise( void )
 {
     extern uint8_t ucMACAddress[ 6 ];
-    if ( enc28j60_init(ucMACAddress) == 0 ) {
+    if ( enc28j60_init(ucMACAddress, hspi1 ) == 0) {
         return pdPASS;
     } else {
         return pdFAIL;
@@ -105,8 +102,7 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 //////////////////////////////////
 // RTOS Tasking Interface
 
-void NetworkingInit(SPI_HandleTypeDef *spiHandle_in) {
-	spiHandle = spiHandle_in;
+void NetworkingInit() {
 	/* Initialise the TCP/IP stack. */
 	printf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
 	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress,

@@ -59,19 +59,16 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define SPI1_ETH_CS_Pin GPIO_PIN_6
 #define SPI1_ETH_CS_GPIO_Port GPIOB
-#define ETH_RESET_Pin GPIO_PIN_7
-#define ETH_RESET_GPIO_Port GPIOB
+#define SPI1_ETH_RESET_Pin GPIO_PIN_7
+#define SPI1_ETH_RESET_GPIO_Port GPIOB
 #define GPIO_LED_Pin GPIO_PIN_13
 #define GPIO_LED_GPIO_Port GPIOC
-#define JOY2_Y_Pin GPIO_PIN_3
-#define JOY2_Y_GPIO_Port GPIOA
-#define JOY2_X_Pin GPIO_PIN_2
-#define JOY2_X_GPIO_Port GPIOA
-#define JOY1_Y_Pin GPIO_PIN_0
-#define JOY1_Y_GPIO_Port GPIOA
-#define JOY1_X_Pin GPIO_PIN_1
-#define JOY1_X_GPIO_Port GPIOA
+#define SPI1_ETH_INT_Pin GPIO_PIN_2
+#define SPI1_ETH_INT_GPIO_Port GPIOB
+#define SPI1_ETH_INT_EXTI_IRQn EXTI2_IRQn
 /* USER CODE BEGIN Private defines */
+
+extern SPI_HandleTypeDef hspi1;
 
 /* USER CODE END Private defines */
 

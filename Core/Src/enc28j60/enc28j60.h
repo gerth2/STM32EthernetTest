@@ -10,6 +10,7 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
+#include "main.h"
 
 void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 xNetworkBufferDescriptor_t *pxGetNetworkBufferWithDescriptor( size_t xRequestedSizeBytes, TickType_t xBlockTimeTicks );
@@ -25,7 +26,7 @@ xNetworkBufferDescriptor_t *pxGetNetworkBufferWithDescriptor( size_t xRequestedS
 extern volatile uint16_t enc28j60_rxrdpt;
 
 // Init ENC28J60
-uint8_t enc28j60_init(uint8_t *macadr);
+uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse);
 
 // Snd/Rcv packets
 void enc28j60_send_packet(uint8_t *data, uint16_t len);
