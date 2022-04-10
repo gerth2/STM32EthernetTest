@@ -1,8 +1,12 @@
 #MicroXplorer Configuration settings - do not modify
 FREERTOS.FootprintOK=true
-FREERTOS.IPParameters=Tasks01,FootprintOK,configUSE_PREEMPTION,configUSE_NEWLIB_REENTRANT,configTOTAL_HEAP_SIZE
-FREERTOS.Tasks01=defaultTask,8,128,StartDefaultTask,Default,NULL,Static,defaultTaskBuffer,defaultTaskControlBlock;task_10ms,48,1024,StartTask_10ms,Default,NULL,Static,task_10msBuffer,task_10msControlBlock;task_500ms,16,512,StartTask500ms,Default,NULL,Static,task_500msBuffer,task_500msControlBlock;task_Server,24,1024,StartTask_Server,Default,NULL,Static,task_ServerBuffer,task_ServerControlBlock
-FREERTOS.configTOTAL_HEAP_SIZE=25360
+FREERTOS.IPParameters=Tasks01,FootprintOK,configUSE_PREEMPTION,configUSE_NEWLIB_REENTRANT,configTOTAL_HEAP_SIZE,configENABLE_FPU,configGENERATE_RUN_TIME_STATS,configMINIMAL_STACK_SIZE,configCHECK_FOR_STACK_OVERFLOW
+FREERTOS.Tasks01=defaultTask,8,128,StartDefaultTask,Default,NULL,Static,defaultTaskBuffer,defaultTaskControlBlock;task_10ms,48,1024,StartTask_10ms,Default,NULL,Static,task_10msBuffer,task_10msControlBlock;task_Server,24,1024,StartTask_Server,Default,NULL,Static,task_ServerBuffer,task_ServerControlBlock
+FREERTOS.configCHECK_FOR_STACK_OVERFLOW=1
+FREERTOS.configENABLE_FPU=1
+FREERTOS.configGENERATE_RUN_TIME_STATS=1
+FREERTOS.configMINIMAL_STACK_SIZE=256
+FREERTOS.configTOTAL_HEAP_SIZE=32000
 FREERTOS.configUSE_NEWLIB_REENTRANT=1
 FREERTOS.configUSE_PREEMPTION=1
 File.Version=6
@@ -171,8 +175,8 @@ RCC.VCOOutputFreq_Value=240000000
 RCC.VcooutputI2S=160000000
 SH.GPXTI2.0=GPIO_EXTI2
 SH.GPXTI2.ConfNb=1
-SPI1.BaudRatePrescaler=SPI_BAUDRATEPRESCALER_4
-SPI1.CalculateBaudRate=4.0 MBits/s
+SPI1.BaudRatePrescaler=SPI_BAUDRATEPRESCALER_2
+SPI1.CalculateBaudRate=8.0 MBits/s
 SPI1.Direction=SPI_DIRECTION_2LINES
 SPI1.IPParameters=VirtualType,Mode,Direction,CalculateBaudRate,BaudRatePrescaler
 SPI1.Mode=SPI_MODE_MASTER

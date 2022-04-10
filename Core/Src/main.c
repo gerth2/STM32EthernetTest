@@ -77,18 +77,6 @@ const osThreadAttr_t task_10ms_attributes = {
   .stack_size = sizeof(task_10msBuffer),
   .priority = (osPriority_t) osPriorityRealtime,
 };
-/* Definitions for task_500ms */
-osThreadId_t task_500msHandle;
-uint32_t task_500msBuffer[ 512 ];
-osStaticThreadDef_t task_500msControlBlock;
-const osThreadAttr_t task_500ms_attributes = {
-  .name = "task_500ms",
-  .cb_mem = &task_500msControlBlock,
-  .cb_size = sizeof(task_500msControlBlock),
-  .stack_mem = &task_500msBuffer[0],
-  .stack_size = sizeof(task_500msBuffer),
-  .priority = (osPriority_t) osPriorityBelowNormal,
-};
 /* Definitions for task_Server */
 osThreadId_t task_ServerHandle;
 uint32_t task_ServerBuffer[ 1024 ];
@@ -114,7 +102,6 @@ static void MX_TIM11_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 void StartDefaultTask(void *argument);
 void StartTask_10ms(void *argument);
-void StartTask500ms(void *argument);
 void StartTask_Server(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -196,9 +183,6 @@ int main(void)
 
   /* creation of task_10ms */
   task_10msHandle = osThreadNew(StartTask_10ms, NULL, &task_10ms_attributes);
-
-  /* creation of task_500ms */
-  task_500msHandle = osThreadNew(StartTask500ms, NULL, &task_500ms_attributes);
 
   /* creation of task_Server */
   task_ServerHandle = osThreadNew(StartTask_Server, NULL, &task_Server_attributes);
@@ -294,7 +278,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -471,7 +455,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(1);
+		osDelay(1000000);
 	}
   /* USER CODE END 5 */
 }
@@ -496,38 +480,10 @@ void StartTask_10ms(void *argument)
 	for (;;) {
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		/* 10mS Periodic Code START */
-		NetworkingPeriodic();
 
 		/* 10mS Periodic Code END */
 	}
   /* USER CODE END StartTask_10ms */
-}
-
-/* USER CODE BEGIN Header_StartTask500ms */
-/**
- * @brief Function implementing the task_500ms thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_StartTask500ms */
-void StartTask500ms(void *argument)
-{
-  /* USER CODE BEGIN StartTask500ms */
-	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.500 * ((double) configTICK_RATE_HZ));
-	xLastWakeTime = xTaskGetTickCount();
-	printf("[MAIN] Starting 500ms task\n");
-
-
-	/* Infinite loop */
-	for (;;) {
-		vTaskDelayUntil(&xLastWakeTime, xFrequency);
-		/* 500mS Periodic Code START */
-
-		/* 500mS Periodic Code END */
-
-	}
-  /* USER CODE END StartTask500ms */
 }
 
 /* USER CODE BEGIN Header_StartTask_Server */
@@ -542,7 +498,7 @@ void StartTask_Server(void *argument)
   /* USER CODE BEGIN StartTask_Server */
 
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.10 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.01 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 	printf("[MAIN] Starting Server task\n");
 
@@ -553,6 +509,7 @@ void StartTask_Server(void *argument)
   {
 	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	serverUpdate();
+
   }
   /* USER CODE END StartTask_Server */
 }

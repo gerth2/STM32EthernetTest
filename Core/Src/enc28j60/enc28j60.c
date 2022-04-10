@@ -237,7 +237,7 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 		enc28j60_bfs(ECON2, ECON2_PKTDEC);
 
 	} else if (eir_flags & EIR_TXIF) {
-		debug("enc28j60: transmit done\n");
+		//debug("enc28j60: transmit done\n");
 		enc28j60_bfc(EIR, EIR_TXIF);
 	} else if (eir_flags & EIR_TXERIF) {
 		debug("enc28j60: transmit error !!\n");
@@ -245,6 +245,8 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 	} else if (eir_flags & EIR_RXERIF) {
 		debug("enc28j60: receive error !!\n");
 		enc28j60_bfc(EIR, EIR_RXERIF);
+	} else if (eir_flags == 0x0) {
+		debug("enc28j60: Warning - interrupt but no flags set for the reaso \n");
 	} else {
 		debug("enc28j60: unknown interrupt flag, we shouldn't be here\n");
 	}
