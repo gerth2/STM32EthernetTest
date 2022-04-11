@@ -64,6 +64,9 @@ void prvSoftTimerInt(void *unused, uint32_t unused2) {
 uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	uint32_t i;
 
+	printf("[MAC] Starting Init...\n");
+
+
 	SpiHandle = spiToUse;
 
 	IRQn_Type irqn_line = EXTI2_IRQn;
@@ -79,7 +82,11 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	enc28j60_soft_reset();
 
 	uint8_t revid = enc28j60_rcr(EREVID);
-	printf("Got hardware revision %d\n", revid);
+	printf("[MAC] Got hardware revision %d\n", revid);
+	if(revid < 5){
+		printf("[MAC] Init FAIL! Invalid hardware revision \n");
+		return -1;
+	}
 
 	// Setup Rx/Tx buffer
 	enc28j60_wcr16(ERXST, ENC28J60_RXSTART);
@@ -130,6 +137,7 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	// enc28j60_wcr(ERXFCON, 0x9F); // packet filtering
 	enc28j60_bfs(ECON1, ECON1_RXEN);
 
+	printf("[MAC] Init Complete!\n");
 	return 0;
 }
 
@@ -280,6 +288,8 @@ void enc28j60_send_packet(uint8_t *data, uint16_t len) {
 	enc28j60_wcr16(ETXND, ENC28J60_TXSTART + len);
 
 	enc28j60_bfs(ECON1, ECON1_TXRTS); // Request packet send
+
+
 }
 
 // Set register bank
