@@ -21,7 +21,6 @@ static uint8_t enc28j60_txrx_byte(uint8_t data);
 static uint8_t enc28j60_read_op(uint8_t cmd, uint8_t adr);
 static void enc28j60_write_op(uint8_t cmd, uint8_t adr, uint8_t data);
 static void prvReceivePacket(void *buf, uint32_t pktlen);
-static void prvSoftTimerInt(void *unused, uint32_t unused2);
 // private global variables definition
 static SPI_HandleTypeDef SpiHandle;
 
@@ -42,23 +41,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 			;
 	}
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
-void prvSoftTimerInt(void *unused, uint32_t unused2) {
-	HAL_Delay(10);
-	HAL_SPI_StateTypeDef spi_state = HAL_SPI_GetState(&SpiHandle);
-	if (enc28j60_rcr(EIR) == 0xFF) {
-		if (xTimerPendFunctionCall(prvSoftTimerInt, NULL, 0, 10) == pdFALSE) {
-			debug("PANIC: enc28j60: daemon's queue full\n");
-			while (1)
-				;
-		}
-	} else {
-		taskENTER_CRITICAL();
-		EXTI2_IRQHandler();
-		taskEXIT_CRITICAL();
-	}
-
 }
 
 uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
