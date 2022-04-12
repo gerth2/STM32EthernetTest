@@ -1,19 +1,60 @@
+
+.outlined{
+    border: 1px solid #FFFFFF;
+    margin: 1px;
+}
+
 body {
-	font-family: sans-serif;
-	text-align: center;
-	padding: 3rem;
-	font-size: 1.125rem;
-	line-height: 1.5;
-	transition: all 725ms ease-in-out;
+    background: black;
+    padding: 0.25em;
+    margin: 0;
+    font-size: 16px;
+    font-family: Verdana, sans-serif;
+    color: white;
 }
 
-h1 {
-	font-size: 2rem;
-	font-weight: bolder;
-	margin-bottom: 1rem;
+/* Ensure we use up the full screen space with our content */
+html,body {
+    height: 99vh;
 }
 
-p {
-	margin-bottom: 1rem;
-	color: tomato;
+table, th, td {
+	border-bottom: 1px solid #ddd;
+	border-collapse: collapse;
 }
+
+th, td {
+	padding: 15px;
+	text-align: left;
+}
+
+tr:hover {background-color: rgb(52, 79, 233);} 
+
+/* Fancy schmancy buttons */
+button {
+    background: #222222;
+    padding: 6.5px 10px;
+    margin: 6.5px 10px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: white;
+    font-size: 13px;
+    font-family: "localMichroma", monospace;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor:pointer;
+ }
+ button:hover {
+    background: #444;
+    color: white;
+ }
+ button:active {
+    background: #333;
+ }
+ button:disabled {
+    background: black;
+    color: #555;
+ }
+
+
