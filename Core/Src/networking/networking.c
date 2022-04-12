@@ -1,22 +1,10 @@
 #include "networking.h"
-#include "FreeRTOS.h"
-#include "FreeRTOS_IP.h"
-#include "FreeRTOS_IP_Private.h"
-#include "NetworkBufferManagement.h"
-#include "server.h"
-#include <string.h>
+
 
 //////////////////////////////////
 // FreeRTOS/Hardware Interface
-static const uint8_t ucIPAddress[4] = { 10, 111, 76, 123 };
-static const uint8_t ucNetMask[4] = { 255, 255, 255, 0 };
-static const uint8_t ucGatewayAddress[4] = { 10, 111, 76, 1 };
-static uint8_t ucMACAddress[6] = { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
-static const uint8_t ucDNSServerAddress[4] = { 1, 1, 1, 1 };
 
-#define MYWWWPORT 80
-#define BUFFER_SIZE 550
-static uint8_t buf[BUFFER_SIZE + 1];
+static uint8_t ucMACAddress[6] = { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
 
 void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 
@@ -105,8 +93,8 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 void NetworkingInit() {
 	/* Initialise the TCP/IP stack. */
 	printf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
-	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress,
-			ucDNSServerAddress, ucMACAddress);
+	FreeRTOS_IPInit(curSettings.ucIPAddress, curSettings.ucNetMask, curSettings.ucGatewayAddress,
+			curSettings.ucDNSServerAddress, ucMACAddress);
 	printf("[HARDWARE] FreeRTOS TCP-IP Stack Init Complete\n");
 }
 

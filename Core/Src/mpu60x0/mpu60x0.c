@@ -130,15 +130,12 @@ static void mpu60x0_checkWhoami(){
 	uint8_t check;
 
 	// check device ID WHO_AM_I
-
 	checkStatus(HAL_I2C_Mem_Read (&imu_i2c, MPU6050_ADDR,WHO_AM_I_REG,1, &check, 1, 1000));
 
-	if (check == BITS_WHOAMI_EXP)  // 0x68 will be returned by the sensor if everything goes well
-	{
+	if (check == BITS_WHOAMI_EXP){  // 0x68 will be returned by the sensor if everything goes well
 		deviceAvailable = 1;
 	} else {
 		printf("[IMU] unexpected WHOAMI response of %d\n", check);
-
 	}
 
 }

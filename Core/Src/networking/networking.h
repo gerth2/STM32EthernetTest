@@ -8,6 +8,13 @@
 
 #include <stdint.h>
 #include "main.h"
+#include "FreeRTOS.h"
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_IP_Private.h"
+#include "NetworkBufferManagement.h"
+#include "server.h"
+#include <string.h>
+#include "settings.h"
 
 void NetworkingInit();
 void NetworkingPeriodic(void);

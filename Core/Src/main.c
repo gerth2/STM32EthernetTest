@@ -27,7 +27,7 @@
 #include "server.h"
 #include "mpu60x0.h"
 #include "fusion.h"
-#include <math.h>
+#include "settings.h"
 
 /* USER CODE END Includes */
 
@@ -149,15 +149,13 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  timeInit();
-
-  RetargetInit(&huart1);
-
   printf("[MAIN] User Init Started...\n");
+  timeInit();
+  RetargetInit(&huart1);
+  fusion_reset();
+  settings_init();
   NetworkingInit();
   mpu60x0_init(hi2c1);
-
-
   printf("[MAIN] User Init Completed!\n");
 
 
