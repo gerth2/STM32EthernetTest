@@ -7,7 +7,7 @@ float gyroZBias = 0;
 
 float yaw = 0;
 
-#define CAL_SAMPLES 200.0
+#define CAL_SAMPLES 500.0
 uint16_t calStep = 0;
 float calAccum = 0;
 
@@ -24,7 +24,7 @@ void fusion_update(){
 	if(fusion_calIsActive()){
 		//calibration mode
 		calStep++;
-		calAccum += mpu60x0_getZGyro()/CAL_SAMPLES;
+		calAccum += mpu60x0_getZGyro();
 
 
 		if(!fusion_calIsActive()){
