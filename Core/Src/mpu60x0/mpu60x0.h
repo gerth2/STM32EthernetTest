@@ -38,5 +38,6 @@ float mpu60x0_getZAccel(void);
 float mpu60x0_getXGyro(void);
 float mpu60x0_getYGyro(void);
 float mpu60x0_getZGyro(void);
+double mpu60x0_getSampleTime(void);
 
 #endif

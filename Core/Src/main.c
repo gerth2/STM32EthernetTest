@@ -26,6 +26,7 @@
 #include "networking.h"
 #include "server.h"
 #include "mpu60x0.h"
+#include "fusion.h"
 #include <math.h>
 
 /* USER CODE END Includes */
@@ -477,6 +478,7 @@ void StartTask_10ms(void *argument)
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		/* 10mS Periodic Code START */
 		mpu60x0_update();
+		fusion_update();
 
 		/* 10mS Periodic Code END */
 	}
@@ -495,7 +497,7 @@ void StartTask_Server(void *argument)
   /* USER CODE BEGIN StartTask_Server */
 
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.01 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.05 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 	printf("[MAIN] Starting Server task\n");
 

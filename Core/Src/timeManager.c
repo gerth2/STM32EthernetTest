@@ -2,7 +2,7 @@
 
 #include "timeManager.h"
 
-double curTime_sec;
+float curTime_sec;
 
 uint16_t prevTimerVal;
 
@@ -16,19 +16,19 @@ void timeInit(){
 
 }
 
-double getCurTime(){
+float getCurTime(){
 
 	taskENTER_CRITICAL();
 	uint16_t curTimerVal = __HAL_TIM_GET_COUNTER(&htim11);
 
-	double deltaTime_sec = 0.0;
+	float deltaTime_sec = 0.0;
 
 	if(curTimerVal > prevTimerVal){
 		//normal case
-		deltaTime_sec = ((double)(curTimerVal - prevTimerVal)) * SEC_PER_TIMER_TICK;
+		deltaTime_sec = ((float)(curTimerVal - prevTimerVal)) * SEC_PER_TIMER_TICK;
 	} else {
 		//Timer rolled over
-		deltaTime_sec = ((double)(65535 - prevTimerVal + curTimerVal + 1)) * SEC_PER_TIMER_TICK;
+		deltaTime_sec = ((float)(65535 - prevTimerVal + curTimerVal + 1)) * SEC_PER_TIMER_TICK;
 	}
 
 	curTime_sec += deltaTime_sec;

@@ -39,17 +39,17 @@ void periodicWSDataSend(void){
 
 	//Create the message to tx
 	char txString[256];
-	double curTime = getCurTime();
 	int strlen;
 
-	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%f, \"accelY\":%f, \"accelZ\":%f, \"gyroX\":%f, \"gyroY\":%f, \"gyroZ\":%f}",
-			curTime,
+	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%f, \"accelY\":%f, \"accelZ\":%f, \"gyroX\":%f, \"gyroY\":%f, \"gyroZ\":%f, \"yaw\":%f}",
+			mpu60x0_getSampleTime(),
 			mpu60x0_getXAccel(),
 			mpu60x0_getYAccel(),
 			mpu60x0_getZAccel(),
 			mpu60x0_getXGyro(),
 			mpu60x0_getYGyro(),
-			mpu60x0_getZGyro()
+			mpu60x0_getZGyro(),
+			fusion_getYaw()
 			);
 
 

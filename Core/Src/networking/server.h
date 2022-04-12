@@ -11,7 +11,7 @@
 #include "timeManager.h"
 #include "stm32f4xx_hal.h"
 #include "mpu60x0.h"
-
+#include "fusion.h"
 
 
 /** Public API */

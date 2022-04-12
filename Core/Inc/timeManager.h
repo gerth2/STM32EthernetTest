@@ -15,7 +15,7 @@ extern "C" {
 extern TIM_HandleTypeDef htim11;
 
 void timeInit(void);
-double getCurTime(void);
+float getCurTime(void);
 
 
 #ifdef __cplusplus

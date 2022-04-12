@@ -15,6 +15,7 @@ int16_t Gyro_Y_RAW = 0;
 int16_t Gyro_Z_RAW = 0;
 
 float Ax, Ay, Az, Gx, Gy, Gz;
+float sampleTime;
 
 
 // Private function declarations
@@ -62,37 +63,26 @@ void mpu60x0_init(I2C_HandleTypeDef i2cHandle){
 }
 
 void mpu60x0_update(){
-	uint8_t Rec_Data[6];
+	uint8_t Rec_Data[14];
 
-	// Read 6 BYTES of data starting from ACCEL_XOUT_H register
+	// Read 14 BYTES of data starting from ACCEL_XOUT_H register
 
-	checkStatus(HAL_I2C_Mem_Read(&imu_i2c, MPU6050_ADDR, ACCEL_XOUT_H_REG, 1, Rec_Data, 6, 1000));
+	taskENTER_CRITICAL();
+	checkStatus(HAL_I2C_Mem_Read(&imu_i2c, MPU6050_ADDR, ACCEL_XOUT_H_REG, 1, Rec_Data, 14, 1000));
+	sampleTime = getCurTime();
+	taskEXIT_CRITICAL();
 
 	Accel_X_RAW = (int16_t)(Rec_Data[0] << 8 | Rec_Data [1]);
 	Accel_Y_RAW = (int16_t)(Rec_Data[2] << 8 | Rec_Data [3]);
 	Accel_Z_RAW = (int16_t)(Rec_Data[4] << 8 | Rec_Data [5]);
 
-	/*** convert the RAW values into acceleration in 'g'
-	     we have to divide according to the Full scale value set in FS_SEL
-	     I have configured FS_SEL = 0. So I am dividing by 16384.0
-	     for more details check ACCEL_CONFIG Register              ****/
-
 	Ax = Accel_X_RAW/16384.0;
 	Ay = Accel_Y_RAW/16384.0;
 	Az = Accel_Z_RAW/16384.0;
 
-	// Read 6 BYTES of data starting from GYRO_XOUT_H register
-
-	checkStatus(HAL_I2C_Mem_Read(&imu_i2c, MPU6050_ADDR, GYRO_XOUT_H_REG, 1, Rec_Data, 6, 1000));
-
-	Gyro_X_RAW = (int16_t)(Rec_Data[0] << 8 | Rec_Data [1]);
-	Gyro_Y_RAW = (int16_t)(Rec_Data[2] << 8 | Rec_Data [3]);
-	Gyro_Z_RAW = (int16_t)(Rec_Data[4] << 8 | Rec_Data [5]);
-
-	/*** convert the RAW values into dps (�/s)
-	     we have to divide according to the Full scale value set in FS_SEL
-	     I have configured FS_SEL = 0. So I am dividing by 131.0
-	     for more details check GYRO_CONFIG Register              ****/
+	Gyro_X_RAW = (int16_t)(Rec_Data[8]  << 8 | Rec_Data [9]);
+	Gyro_Y_RAW = (int16_t)(Rec_Data[10] << 8 | Rec_Data [11]);
+	Gyro_Z_RAW = (int16_t)(Rec_Data[12] << 8 | Rec_Data [13]);
 
 	Gx = Gyro_X_RAW/131.0;
 	Gy = Gyro_Y_RAW/131.0;
@@ -124,6 +114,11 @@ float mpu60x0_getYGyro(){
 float mpu60x0_getZGyro(){
 	return Gz;
 }
+
+double mpu60x0_getSampleTime(){
+	return sampleTime;
+}
+
 
 static void mpu60x0_checkWhoami(){
 
