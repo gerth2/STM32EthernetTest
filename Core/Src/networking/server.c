@@ -40,10 +40,17 @@ void periodicWSDataSend(void){
 	//Create the message to tx
 	char txString[256];
 	double curTime = getCurTime();
-	double testVal = 10 + 5.0 * sin(2 * 3.41459 * 0.5 * curTime);
 	int strlen;
 
-	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%lf}",curTime, testVal);
+	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%f, \"accelY\":%f, \"accelZ\":%f, \"gyroX\":%f, \"gyroY\":%f, \"gyroZ\":%f}",
+			curTime,
+			mpu60x0_getXAccel(),
+			mpu60x0_getYAccel(),
+			mpu60x0_getZAccel(),
+			mpu60x0_getXGyro(),
+			mpu60x0_getYGyro(),
+			mpu60x0_getZGyro()
+			);
 
 
 	//For all connections in list...

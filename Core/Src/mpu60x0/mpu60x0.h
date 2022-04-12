@@ -32,5 +32,11 @@
 // Public API
 void mpu60x0_update(void);
 void mpu60x0_init(I2C_HandleTypeDef i2cHandle);
+float mpu60x0_getXAccel(void);
+float mpu60x0_getYAccel(void);
+float mpu60x0_getZAccel(void);
+float mpu60x0_getXGyro(void);
+float mpu60x0_getYGyro(void);
+float mpu60x0_getZGyro(void);
 
 #endif
