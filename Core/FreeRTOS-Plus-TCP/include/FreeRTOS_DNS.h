@@ -109,6 +109,21 @@
 /** @brief Define the ASCII value of '.' (Period/Full-stop). */
     #define ASCII_BASELINE_DOT    46U
 
+/* Blah Blah Blah (MDNS)
+ * is been added by me even though I don't know what I'm doing.
+ * Note that a special MAC address is required in addition to the NIC's actual
+ * MAC address: 01:00:5E:00:00:FB
+ *
+ * The target IP address will be 224.0.0.251
+ */
+	#if ( ipconfigBYTE_ORDER == pdFREERTOS_BIG_ENDIAN )
+		#define ipMDNS_IP_ADDR    0xE00000FBUL
+	#else
+		#define ipMDNS_IP_ADDR    0xFB0000E0UL
+	#endif /* ipconfigBYTE_ORDER == pdFREERTOS_BIG_ENDIAN */
+
+	#define ipLLMNR_PORT           5355 /* Standard LLMNR port. */
+
 /* The Link-local Multicast Name Resolution (LLMNR)
  * is included.
  * Note that a special MAC address is required in addition to the NIC's actual

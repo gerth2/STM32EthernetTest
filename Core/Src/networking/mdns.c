@@ -759,8 +759,6 @@ void mdns_update(){
 		return;
 	}
 
-	advertise();
-
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
 	uint8_t ucBuffer[ RX_BUFFER_SIZE ];
 	int8_t cIPAddressString[ 16 ];

@@ -297,6 +297,9 @@ uint16_t usPacketIdentifier = 0U;
  * reference. */
 const MACAddress_t xBroadcastMACAddress = { { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } };
 
+const MACAddress_t xMDNSMACAddress = { { 0x01, 0x00, 0x5e, 0x00, 0x00, 0xfb } };
+
+
 /** @brief Structure that stores the netmask, gateway address and DNS server addresses. */
 NetworkAddressingParameters_t xNetworkAddressing = { 0, 0, 0, 0, 0 };
 
@@ -1656,6 +1659,11 @@ eFrameProcessingResult_t eConsiderFrameForProcessing( const uint8_t * const pucE
         /* The packet was a broadcast - process it. */
         eReturn = eProcessBuffer;
     }
+    else if( memcmp( xMDNSMACAddress.ucBytes, pxEthernetHeader->xDestinationAddress.ucBytes, sizeof( MACAddress_t ) ) == 0 )
+    {
+        /* The packet was MDNS - process it. */
+        eReturn = eProcessBuffer;
+    }
     else
     #if ( ipconfigUSE_LLMNR == 1 )
         if( memcmp( xLLMNR_MacAdress.ucBytes, pxEthernetHeader->xDestinationAddress.ucBytes, sizeof( MACAddress_t ) ) == 0 )
@@ -2003,6 +2011,8 @@ static eFrameProcessingResult_t prvAllowIPPacket( const IPPacket_t * const pxIPP
                      ( ulDestinationIPAddress != ipBROADCAST_IP_ADDRESS ) &&
                      /* Is it a specific broadcast address 192.168.1.255 ? */
                      ( ulDestinationIPAddress != xNetworkAddressing.ulBroadcastAddress ) &&
+                     /* Is it the MDNS multicast address? */
+                     ( ulDestinationIPAddress != ipMDNS_IP_ADDR ) &&
                      #if ( ipconfigUSE_LLMNR == 1 )
                          /* Is it the LLMNR multicast address? */
                          ( ulDestinationIPAddress != ipLLMNR_IP_ADDR ) &&
