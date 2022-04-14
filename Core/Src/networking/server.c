@@ -67,11 +67,20 @@ void periodicWSDataSend(void){
 
 }
 
+const char * pcApplicationHostnameHook( void ){
+	return curSettings.deviceName;
+}
+
+BaseType_t xApplicationDNSQueryHook( const char * pcName ){
+	return (strcmp(pcName, curSettings.deviceName)==0);
+}
+
 void serverInit(void) {
 	mg_log_set(s_debug_level);
 	mg_mgr_init(&mgr);
 	LOG(LL_INFO, ("Starting Mongoose v%s", MG_VERSION));  // Tell the world
 	mg_http_listen(&mgr, s_listening_address, cb, &mgr);  // Web listener
+	mdns_init();
 
 	serverIsRunning = 1;
 }

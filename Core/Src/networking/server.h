@@ -8,6 +8,7 @@
 
 #include "mongoose.h"
 #include "networking.h"
+#include "mdns.h"
 #include "timeManager.h"
 #include "stm32f4xx_hal.h"
 #include "mpu60x0.h"

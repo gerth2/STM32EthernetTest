@@ -116,7 +116,8 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	enc28j60_bfs(EIE,
 			EIE_INTIE | EIE_TXIE | EIE_PKTIE | EIE_TXERIE | EIE_RXERIE);
 	// Enable Rx packets
-	// enc28j60_wcr(ERXFCON, 0x9F); // packet filtering
+
+	enc28j60_wcr(ERXFCON, 0x00); // promiscuous mode - pass all packets
 	enc28j60_bfs(ECON1, ECON1_RXEN);
 
 	printf("[MAC] Init Complete!\n");
