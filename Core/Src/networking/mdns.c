@@ -740,7 +740,7 @@ uint8_t mdns_ready = 0;
 
 void mdns_init(){
 
-	uint8_t result = begin(curSettings.deviceName, "_nwimu._tcp", 80, 3600);
+	uint8_t result = begin(curSettings.deviceName, "_http._tcp", 80, 600);
 
 	if(result == 0){
 		printf("[MDNS] successfully set up for %s.local\n", curSettings.deviceName);
@@ -758,6 +758,8 @@ void mdns_update(){
 	if(!mdns_ready){
 		return;
 	}
+
+	advertise();
 
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
 	uint8_t ucBuffer[ RX_BUFFER_SIZE ];
