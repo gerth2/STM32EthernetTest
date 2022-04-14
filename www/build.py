@@ -26,6 +26,7 @@ class FileContents():
         return "static const char {}[] = {};".format(self.codeName, self.fileContentsStr)
 
 
+
 if __name__ == "__main__":
 
     # Find all files to include
@@ -39,20 +40,22 @@ if __name__ == "__main__":
         for file in src_file_list:
             pageData += (file.getDeclaration() + "\n\n")
 
-        first = True
         switchyard = ""
-        for file in src_file_list:
-            if(first): 
-                switchyard += "if(mg_http_match_uri(hm, \"{}\")) {{\n".format(file.url)
-                first = False
-            else:
-                switchyard += "else if(mg_http_match_uri(hm, \"{}\")) {{\n".format(file.url)
 
+        #Hardcode the homepage
+        switchyard += "if(mg_http_match_uri(hm, \"/\")) {\n"
+        switchyard += "      mg_http_reply(c, 200,  header_html,  index_html );\n"
+        switchyard += "      printf(\"[WEBSERVER] Served /\\n\");\n"
+        switchyard += "   } "
+
+        # Handle the other files too
+        for file in src_file_list:
+            switchyard += "else if(mg_http_match_uri(hm, \"{}\")) {{\n".format(file.url)
             switchyard += "      mg_http_reply(c, 200,  header_{},  {} );\n".format(file.mimeType ,file.codeName)
             switchyard += "      printf(\"[WEBSERVER] Served {}\\n\");\n".format(file.url)
-
             switchyard += "   } "
 
+        # Hardcode the 404 page
         switchyard += "else {\n"
         switchyard += "      //URL Not found\n"
         switchyard += "      printf(\"[WEBSERVER] Could not find requested resource!\\n\");\n"

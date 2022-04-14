@@ -22,7 +22,10 @@ static const char test_html[] = "<!DOCTYPE html>\n<html>\n<head/>\n<body>\nJust 
 void handleHttpFileServe(struct mg_connection *c, struct mg_http_message * hm)
 {
 
-   if(mg_http_match_uri(hm, "/FourOhFour.html")) {
+   if(mg_http_match_uri(hm, "/")) {
+      mg_http_reply(c, 200,  header_html,  index_html );
+      printf("[WEBSERVER] Served /\n");
+   } else if(mg_http_match_uri(hm, "/FourOhFour.html")) {
       mg_http_reply(c, 200,  header_html,  FourOhFour_html );
       printf("[WEBSERVER] Served /FourOhFour.html\n");
    } else if(mg_http_match_uri(hm, "/index.html")) {
