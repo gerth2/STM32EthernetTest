@@ -122,7 +122,7 @@
 		#define ipMDNS_IP_ADDR    0xFB0000E0UL
 	#endif /* ipconfigBYTE_ORDER == pdFREERTOS_BIG_ENDIAN */
 
-	#define ipLLMNR_PORT           5355 /* Standard LLMNR port. */
+	#define ipMDNS_PORT           5353 /* Standard MDNS port. */
 
 /* The Link-local Multicast Name Resolution (LLMNR)
  * is included.

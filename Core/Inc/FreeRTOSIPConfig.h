@@ -131,6 +131,7 @@ used as defaults. */
 /* Include support for LLMNR: Link-local Multicast Name Resolution
 (non-Microsoft) */
 #define ipconfigUSE_LLMNR					( 0 )
+#define ipconfigUSE_MDNS                    ( 1 )
 
 /* Include support for DNS caching.  For TCP, having a small DNS cache is very
 useful.  When a cache is present, ipconfigDNS_REQUEST_ATTEMPTS can be kept low

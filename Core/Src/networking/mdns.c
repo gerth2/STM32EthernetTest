@@ -281,7 +281,7 @@ void onUdpReceive(
 		data[8] || data[9]         					      // NSCOUNT == 0
 	)
 	{
-		return;
+		//return;
 	}
 	// obtain end of name label
 	uint8_t length = 0;
@@ -305,7 +305,7 @@ void onUdpReceive(
 	uint8_t type = (uint8_t)*(name + length);
 
 #ifdef MDNS_DEBUG
-	printf("[MDNS] %d\n", type);
+	printf("[MDNS] Processing Type %d\n", type);
 #endif
 	if (type == TYPE_A && !strcmp(name, (char*)_queryFQDN))
 	{
