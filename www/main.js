@@ -32,4 +32,5 @@ webSocket.onmessage = function (event) {
 	document.getElementById("ygyro").innerHTML = rxData.gyroY;
 	document.getElementById("zgyro").innerHTML = rxData.gyroZ;
 	document.getElementById("yaw").innerHTML = rxData.yaw;
+	document.getElementById("heapFree").innerHTML = rxData.heapFree;
 }

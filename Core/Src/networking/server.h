@@ -13,7 +13,7 @@
 #include "stm32f4xx_hal.h"
 #include "mpu60x0.h"
 #include "fusion.h"
-
+#include "perfMon.h"
 
 /** Public API */
 void serverInit(void);
