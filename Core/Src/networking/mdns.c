@@ -705,7 +705,7 @@ void sendResponse(
 	int32_t iReturned;
 
     xDestinationAddress.sin_addr = FreeRTOS_inet_addr_quick( src_ip[0], src_ip[1], src_ip[2], src_ip[3] );
-    xDestinationAddress.sin_port = FreeRTOS_htons( src_port );
+    xDestinationAddress.sin_port = ( src_port ); //conversion to byte order already done.
 
     /* Send the buffer with ulFlags set to 0, so the FREERTOS_ZERO_COPY bit
     is clear. */
@@ -737,6 +737,7 @@ void sendResponse(
 }
 
 uint8_t mdns_ready = 0;
+uint16_t advertise_counter = 0;
 
 void mdns_init(){
 
@@ -759,7 +760,11 @@ void mdns_update(){
 		return;
 	}
 
-	advertise();
+	advertise_counter++;
+	if(advertise_counter > 200){
+		advertise();
+		advertise_counter = 0;
+	}
 
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
 	uint8_t ucBuffer[ RX_BUFFER_SIZE ];

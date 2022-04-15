@@ -451,7 +451,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(1000);
+		//osDelay(1000);
 		mdns_update();
 	}
   /* USER CODE END 5 */
