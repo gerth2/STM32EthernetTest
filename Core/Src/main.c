@@ -451,7 +451,9 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(1000);
+		//osDelay(1000);
+		mdns_update(); //currently this function blocks like foreverz so...it's here.
+
 	}
   /* USER CODE END 5 */
 }
@@ -506,8 +508,6 @@ void StartTask_Server(void *argument)
   {
 	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	serverUpdate();
-	mdns_update();
-
   }
   /* USER CODE END StartTask_Server */
 }
