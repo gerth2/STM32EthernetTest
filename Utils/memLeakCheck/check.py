@@ -45,8 +45,15 @@ with open("log1.txt", "r") as log:
                 print("ERROR: Free called witout alloc")
                 print(">> FREE: {}".format(rmalloc))
 
-
+leakedRAM = {}
 for unfreed in heapModel.values():
-    print("ERROR: Unfreed allocation.")
-    print(">> MALLOC: {}".format(unfreed))
+    
+    if(unfreed.caller in leakedRAM.keys()):
+        leakedRAM[unfreed.caller] += int(unfreed.size)
+    else:
+        leakedRAM[unfreed.caller] = int(unfreed.size)
+
+
+for src in leakedRAM.keys():
+    print("ERROR: Source {} leaked {} bytes.".format(src, leakedRAM[src]))
 

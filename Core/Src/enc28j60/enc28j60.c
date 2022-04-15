@@ -171,7 +171,7 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 		enc28j60_read_buffer((void*) (&status), sizeof(status));
 
 		if (status & 0x80) //success
-				{
+		{
 			// Throw out crc
 			xBytesReceived = rxlen - 4;
 
@@ -209,8 +209,6 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 			} else {
 				/* The event was lost because a network buffer was not available.
 				 Call the standard trace macro to log the occurrence. */
-				vReleaseNetworkBufferAndDescriptor(pxBufferDescriptor);
-
 				iptraceETHERNET_RX_EVENT_LOST();
 			}
 		}

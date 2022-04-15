@@ -12,11 +12,14 @@ function selectTab(evt, tabName) {
 	evt.currentTarget.className += " active";
   }
 
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
 url = "ws://" + window.location.hostname +":" + window.location.port + "/websocket"
 webSocket = new WebSocket(url);
 
 webSocket.onopen = function (event) {
-
+	
 };
 
 webSocket.onmessage = function (event) {
