@@ -1,17 +1,9 @@
 #include "enc28j60.h"
 
-#ifdef DEBUG
 #include <stdio.h>
-
 #define debug(format, ...)     threadSafePrintf(format,##__VA_ARGS__)
+//#define debug(format, ...)
 
-/*
- * Disable STDOUT buffering to enable printing before a newline
- * character or buffer flush.
- */
-#else
-    #define debug(format, ...)
-#endif /* DEBUG */
 
 // private functions declarations
 static void enc28j60_select();
