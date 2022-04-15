@@ -105,9 +105,9 @@ __attribute__((weak)) int _write(int fd, char *ptr, int len)
 	  HAL_StatusTypeDef hstatus;
 
 	  if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-		taskENTER_CRITICAL();
+		//taskENTER_CRITICAL();
 	    hstatus = HAL_UART_Transmit(gHuart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
-		taskEXIT_CRITICAL();
+		//taskEXIT_CRITICAL();
 
 	    if (hstatus == HAL_OK)
 	      return len;

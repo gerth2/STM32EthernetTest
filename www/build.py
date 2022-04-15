@@ -1,4 +1,5 @@
-import os,gzip,json
+import os,gzip,json,htmlmin
+from jsmin import jsmin
 from string import Template
 
 from cachetools import RRCache
@@ -19,8 +20,18 @@ class FileContents():
         self.mimeType = tmp[1].replace(".", "")
 
         with open(self.sourceFile, "r") as infile:
-            self.fileContentsStr = json.dumps(infile.read())
+            fileContents = infile.read()
 
+            if(self.mimeType=="html"):
+                minContents = htmlmin.minify(fileContents, remove_comments=True, remove_empty_space=True)
+            elif(self.mimeType=="css"):
+                minContents = fileContents.replace("\n\n", "\n").replace("    ", "")
+            elif(self.mimeType=="js"):
+                minContents = jsmin(fileContents)
+            else:
+                minContents = fileContents
+
+            self.fileContentsStr = json.dumps(minContents)
 
     def getDeclaration(self):
         return "static const char {}[] = {};".format(self.codeName, self.fileContentsStr)

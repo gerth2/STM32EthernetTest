@@ -1,6 +1,16 @@
-function myFunction() {
-	document.getElementById("demo").style.color = "red";
-}
+function selectTab(evt, tabName) {
+	var i, tabcontent, tablinks;
+	tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+	  tabcontent[i].style.display = "none";
+	}
+	tablinks = document.getElementsByClassName("tablinks");
+	for (i = 0; i < tablinks.length; i++) {
+	  tablinks[i].className = tablinks[i].className.replace(" active", "");
+	}
+	document.getElementById(tabName).style.display = "block";
+	evt.currentTarget.className += " active";
+  }
 
 url = "ws://" + window.location.hostname +":" + window.location.port + "/websocket"
 webSocket = new WebSocket(url);
@@ -19,5 +29,4 @@ webSocket.onmessage = function (event) {
 	document.getElementById("ygyro").innerHTML = rxData.gyroY;
 	document.getElementById("zgyro").innerHTML = rxData.gyroZ;
 	document.getElementById("yaw").innerHTML = rxData.yaw;
-
 }

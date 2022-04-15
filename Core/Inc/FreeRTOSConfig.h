@@ -181,9 +181,9 @@ standard names. */
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
   //Trace amacros
-//#define traceMALLOC( pvAddress, uiSize ) printf("MALLOC %#016X : %#016X : %d \n", __builtin_return_address(0), pvAddress, uiSize);
+#define traceMALLOC( pvAddress, uiSize ) printf("MALLOC %#016X : %#016X : %d \n", __builtin_return_address(0), pvAddress, uiSize);
 
-//#define traceFREE( pvAddress, uiSize ) printf("FREE %#016X : %#016X : %d \n",  __builtin_return_address(0), pvAddress, uiSize);
+#define traceFREE( pvAddress, uiSize ) printf("FREE %#016X : %#016X : %d \n",  __builtin_return_address(0), pvAddress, uiSize);
 
 /* USER CODE END Defines */
 
