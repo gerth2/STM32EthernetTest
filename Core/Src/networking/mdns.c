@@ -32,7 +32,7 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  */
-#define MDNS_DEBUG
+//#define MDNS_DEBUG
 //#define SEND_SOA_ON_AAAA_ERROR
 //#define SEND_NSEC_WITH_A_RECORD
 #define TYPE_A 1
@@ -738,6 +738,7 @@ void sendResponse(
 
 uint8_t mdns_ready = 0;
 uint16_t advertise_counter = 0;
+uint8_t total_advertisements = 0;
 
 void mdns_init(){
 
@@ -799,10 +800,11 @@ void mdns_update(){
 	        FreeRTOS_inet_ntoa( xSourceAddress.sin_addr, ( char * ) cIPAddressString );
 
 	        /* Print out details of the data source. */
-	        printf( "[MDNS] Received %d bytes from IP address %s port number %drn\n",
-	                    iReturned, /* The number of bytes received. */
-	                    cIPAddressString, /* The IP address that sent the data. */
-	                    FreeRTOS_ntohs( xSourceAddress.sin_port ) ); /* The source port. */
+	        //printf( "[MDNS] Received %d bytes from IP address %s port number %drn\n",
+	         //           iReturned, /* The number of bytes received. */
+	         //           cIPAddressString, /* The IP address that sent the data. */
+	      //              FreeRTOS_ntohs( xSourceAddress.sin_port ) ); /* The source port. */
+
 
 	        onUdpReceive(
 	        	dip,

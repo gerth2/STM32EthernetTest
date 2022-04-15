@@ -209,6 +209,8 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 			} else {
 				/* The event was lost because a network buffer was not available.
 				 Call the standard trace macro to log the occurrence. */
+				vReleaseNetworkBufferAndDescriptor(pxBufferDescriptor);
+
 				iptraceETHERNET_RX_EVENT_LOST();
 			}
 		}
