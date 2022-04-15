@@ -3,7 +3,7 @@
 #ifdef DEBUG
 #include <stdio.h>
 
-#define debug(format, ...)     printf(format,##__VA_ARGS__)
+#define debug(format, ...)     threadSafePrintf(format,##__VA_ARGS__)
 
 /*
  * Disable STDOUT buffering to enable printing before a newline
@@ -46,7 +46,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	uint32_t i;
 
-	printf("[MAC] Starting Init...\n");
+	threadSafePrintf("[MAC] Starting Init...\n");
 
 
 	SpiHandle = spiToUse;
@@ -64,9 +64,9 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	enc28j60_soft_reset();
 
 	uint8_t revid = enc28j60_rcr(EREVID);
-	printf("[MAC] Got hardware revision %d\n", revid);
+	threadSafePrintf("[MAC] Got hardware revision %d\n", revid);
 	if(revid < 5){
-		printf("[MAC] Init FAIL! Invalid hardware revision \n");
+		threadSafePrintf("[MAC] Init FAIL! Invalid hardware revision \n");
 		return -1;
 	}
 
@@ -120,7 +120,7 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	enc28j60_wcr(ERXFCON, 0x00); // promiscuous mode - pass all packets
 	enc28j60_bfs(ECON1, ECON1_RXEN);
 
-	printf("[MAC] Init Complete!\n");
+	threadSafePrintf("[MAC] Init Complete!\n");
 	return 0;
 }
 

@@ -35,6 +35,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+
 #define STDIN_FILENO  0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
@@ -57,6 +58,8 @@ void RetargetInit(UART_HandleTypeDef *huart) {
    * chars are sent out as soon as they are printed. */
   setvbuf(stdout, NULL, _IONBF, 0);
 }
+
+
 
 
 /* Functions */
@@ -87,9 +90,7 @@ __attribute__((weak)) int _read(int fd, char *ptr, int len)
 
 	  if (fd == STDIN_FILENO) {
 
-		taskENTER_CRITICAL();
 	    hstatus = HAL_UART_Receive(gHuart, (uint8_t *) ptr, 1, HAL_MAX_DELAY);
-		taskEXIT_CRITICAL();
 
 	    if (hstatus == HAL_OK)
 	      return 1;
@@ -105,9 +106,7 @@ __attribute__((weak)) int _write(int fd, char *ptr, int len)
 	  HAL_StatusTypeDef hstatus;
 
 	  if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-		//taskENTER_CRITICAL();
 	    hstatus = HAL_UART_Transmit(gHuart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
-		//taskEXIT_CRITICAL();
 
 	    if (hstatus == HAL_OK)
 	      return len;

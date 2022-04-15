@@ -5,6 +5,7 @@
 #include <FreeRTOS_IP.h>
 #include "FreeRTOS_IP_Private.h"
 #include <math.h>
+#include "debugUtils.h"
 
 #include "mongoose.h"
 #include "networking.h"

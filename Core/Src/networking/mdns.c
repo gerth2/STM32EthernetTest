@@ -166,9 +166,9 @@ uint8_t begin(
         xBindAddress.sin_port = FreeRTOS_htons( MDNS_PORT );
         if( FreeRTOS_bind( mdnsSocket, &xBindAddress, sizeof( &xBindAddress ) ) == 0 )
         {
-        	printf("[MDNS] Successful socket creation & bind\n");
+        	threadSafePrintf("[MDNS] Successful socket creation & bind\n");
         } else {
-        	printf("[MDNS] Socket bind failed. MDNS not available.\n");
+        	threadSafePrintf("[MDNS] Socket bind failed. MDNS not available.\n");
         	return 2;
         }
     }
@@ -176,7 +176,7 @@ uint8_t begin(
     {
         /* There was insufficient FreeRTOS heap memory available for the socket
         to be created. */
-    	printf("[MDNS] Socket creation failed. MDNS not available.\n");
+    	threadSafePrintf("[MDNS] Socket creation failed. MDNS not available.\n");
     	return 2;
     }
 
@@ -212,12 +212,12 @@ uint8_t begin(
 	_queryFQDN[1 + n + 5] = 'l';
 	_queryFQDN[1 + n + 6] = 0;
 #ifdef MDNS_DEBUG
-	printf("[MDNS] Instance:");
+	threadSafePrintf("[MDNS] Instance:");
 	for (uint8_t i = 0; i < _queryFQDNLen; ++i)
 	{
-		printf("%c", (uint8_t)_queryFQDN[i]);
+		threadSafePrintf("%c", (uint8_t)_queryFQDN[i]);
 	}
-	printf("\n");
+	threadSafePrintf("\n");
 #endif
 
 
@@ -247,12 +247,12 @@ uint8_t begin(
 	_querySN[1 + n + 6] = 0;
 	_querySNLen = n + 8;
 #ifdef MDNS_DEBUG
-	printf("[MDNS] Service: ");
+	threadSafePrintf("[MDNS] Service: ");
 	for (uint8_t i = 0; i < _querySNLen; ++i)
 	{
-		printf("%c",(uint8_t)_querySN[i]);
+		threadSafePrintf("%c",(uint8_t)_querySN[i]);
 	}
-	printf("\n");
+	threadSafePrintf("\n");
 #endif
 
 
@@ -305,7 +305,7 @@ void onUdpReceive(
 	uint8_t type = (uint8_t)*(name + length);
 
 #ifdef MDNS_DEBUG
-	printf("[MDNS] Processing Type %d\n", type);
+	threadSafePrintf("[MDNS] Processing Type %d\n", type);
 #endif
 	if (type == TYPE_A && !strcmp(name, (char*)_queryFQDN))
 	{
@@ -431,7 +431,7 @@ void sendResponse(
 	if (type == RESPONSE_DOMAIN_LOCAL)
 	{
 #ifdef MDNS_DEBUG
-		printf("[MDNS] Requesting .local domain info.\n");
+		threadSafePrintf("[MDNS] Requesting .local domain info.\n");
 #endif
 		_responseLen =
 			HEADER_SIZE +
@@ -444,7 +444,7 @@ void sendResponse(
 	else if (type == RESPONSE_SERVICES_QUERY)
 	{
 #ifdef MDNS_DEBUG
-		printf("[MDNS] Requesting all services.\n");
+		threadSafePrintf("[MDNS] Requesting all services.\n");
 #endif
 		_responseLen =
 			HEADER_SIZE +
@@ -455,7 +455,7 @@ void sendResponse(
 	else if (type == RESPONSE_SERVICE_INSTANCE)
 	{
 #ifdef MDNS_DEBUG
-		printf("[MDNS] Requesting instance of registered service.\n");
+		threadSafePrintf("[MDNS] Requesting instance of registered service.\n");
 #endif
 		_responseLen =
 			HEADER_SIZE +
@@ -467,7 +467,7 @@ void sendResponse(
 	else if (type == RESPONSE_SERVICE_SRV)
 	{
 #ifdef MDNS_DEBUG
-		printf("[MDNS] Requesting SRV of instance.\n");
+		threadSafePrintf("[MDNS] Requesting SRV of instance.\n");
 #endif
 		_responseLen =
 			HEADER_SIZE +
@@ -482,7 +482,7 @@ void sendResponse(
 	else if (type == RESPONSE_SERVICE_TXT)
 	{
 #ifdef MDNS_DEBUG
-		printf("[MDNS] Requesting TXT of instance.\n");
+		threadSafePrintf("[MDNS] Requesting TXT of instance.\n");
 #endif
 		_responseLen =
 			HEADER_SIZE +
@@ -729,9 +729,9 @@ void sendResponse(
         /* The data was successfully queued for sending.  128 bytes will have
         been copied out of ucBuffer and into a buffer inside the TCP/IP stack.
         ucBuffer can be re-used now. */
-    	printf("[MDNS] Response send success\n");
+    	threadSafePrintf("[MDNS] Response send success\n");
     } else {
-    	printf("[MDNS] Response send failure\n");
+    	threadSafePrintf("[MDNS] Response send failure\n");
     }
 
 }
@@ -745,10 +745,10 @@ void mdns_init(){
 	uint8_t result = begin(curSettings.deviceName, "_http._tcp", 80, 600);
 
 	if(result == 0){
-		printf("[MDNS] successfully set up for %s.local\n", curSettings.deviceName);
+		threadSafePrintf("[MDNS] successfully set up for %s.local\n", curSettings.deviceName);
 		mdns_ready = 1;
 	} else {
-		printf("[MDNS] setup FAIL!\n");
+		threadSafePrintf("[MDNS] setup FAIL!\n");
 	}
 
 }
@@ -800,7 +800,7 @@ void mdns_update(){
 	        FreeRTOS_inet_ntoa( xSourceAddress.sin_addr, ( char * ) cIPAddressString );
 
 	        /* Print out details of the data source. */
-	        //printf( "[MDNS] Received %d bytes from IP address %s port number %drn\n",
+	        //threadSafePrintf( "[MDNS] Received %d bytes from IP address %s port number %drn\n",
 	         //           iReturned, /* The number of bytes received. */
 	         //           cIPAddressString, /* The IP address that sent the data. */
 	      //              FreeRTOS_ntohs( xSourceAddress.sin_port ) ); /* The source port. */

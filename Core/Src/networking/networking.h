@@ -15,6 +15,8 @@
 #include "server.h"
 #include <string.h>
 #include "settings.h"
+#include "debugUtils.h"
+#include "enc28j60.h"
 
 void NetworkingInit();
 void NetworkingPeriodic(void);

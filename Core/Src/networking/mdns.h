@@ -7,19 +7,13 @@
 #include "FreeRTOS_sockets.h"
 #include <ctype.h>
 #include "settings.h"
+#include "debugUtils.h"
 #define INSTANCE_LENGTH 20
 #define SERVICE_LENGTH 30
 
 #define IP_LEN 4
 
-static uint8_t begin(
-	const char* szInstance,
-	const char* szService,
-	uint16_t port,
-	uint32_t ttlSeconds
-);
-
-static void advertise();
+void advertise();
 
 void mdns_init(void);
 void mdns_update(void);

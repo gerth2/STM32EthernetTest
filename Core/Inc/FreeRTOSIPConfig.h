@@ -82,8 +82,8 @@
 console before the network is connected then a UDP port after the network has
 connected. */
 #ifdef DEBUG
-    #include <stdio.h>
-    #define vLoggingPrintf(format, ...) printf(format,##__VA_ARGS__)
+    #include <debugUtils.h>
+    #define vLoggingPrintf(format, ...) threadSafePrintf(format,##__VA_ARGS__)
     /*
      * Disable STDOUT buffering to enable printing before a newline 
      * character or buffer flush.

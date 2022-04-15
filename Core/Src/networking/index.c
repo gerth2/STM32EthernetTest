@@ -24,25 +24,25 @@ void handleHttpFileServe(struct mg_connection *c, struct mg_http_message * hm)
 
    if(mg_http_match_uri(hm, "/")) {
       mg_http_reply(c, 200,  header_html,  index_html );
-      printf("[WEBSERVER] Served /\n");
+      threadSafePrintf("[WEBSERVER] Served /\n");
    } else if(mg_http_match_uri(hm, "/FourOhFour.html")) {
       mg_http_reply(c, 200,  header_html,  FourOhFour_html );
-      printf("[WEBSERVER] Served /FourOhFour.html\n");
+      threadSafePrintf("[WEBSERVER] Served /FourOhFour.html\n");
    } else if(mg_http_match_uri(hm, "/index.html")) {
       mg_http_reply(c, 200,  header_html,  index_html );
-      printf("[WEBSERVER] Served /index.html\n");
+      threadSafePrintf("[WEBSERVER] Served /index.html\n");
    } else if(mg_http_match_uri(hm, "/main.css")) {
       mg_http_reply(c, 200,  header_css,  main_css );
-      printf("[WEBSERVER] Served /main.css\n");
+      threadSafePrintf("[WEBSERVER] Served /main.css\n");
    } else if(mg_http_match_uri(hm, "/main.js")) {
       mg_http_reply(c, 200,  header_js,  main_js );
-      printf("[WEBSERVER] Served /main.js\n");
+      threadSafePrintf("[WEBSERVER] Served /main.js\n");
    } else if(mg_http_match_uri(hm, "/test.html")) {
       mg_http_reply(c, 200,  header_html,  test_html );
-      printf("[WEBSERVER] Served /test.html\n");
+      threadSafePrintf("[WEBSERVER] Served /test.html\n");
    } else {
       //URL Not found
-      printf("[WEBSERVER] Could not find requested resource!\n");
+      threadSafePrintf("[WEBSERVER] Could not find requested resource!\n");
       mg_http_reply(c, 404,  header_html,  FourOhFour_html );
    } 
 

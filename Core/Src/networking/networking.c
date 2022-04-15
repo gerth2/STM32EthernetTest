@@ -23,7 +23,7 @@ BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescrip
 {
     enc28j60_send_packet(pxDescriptor->pucEthernetBuffer, pxDescriptor->xDataLength );
 
-    //printf("FreeRTOS: Packet forwarded to driver for transmiting...\n");
+    //threadSafePrintf("FreeRTOS: Packet forwarded to driver for transmiting...\n");
     /* Call the standard trace macro to log the send event. */
     iptraceNETWORK_INTERFACE_TRANSMIT();
 
@@ -42,10 +42,10 @@ uint8_t serverStatus = SERVER_NOCHANGE;
 //void HttpserverTask( void *pvParameters );
 void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
 	if (eNetworkEvent == eNetworkUp) {
-		printf("[HARDWARE] Network UP\n");
+		threadSafePrintf("[HARDWARE] Network UP\n");
 		serverStatus = SERVER_INIT;
 	} else if (eNetworkEvent == eNetworkDown) {
-		printf("[HARDWARE] Network DOWN\n");
+		threadSafePrintf("[HARDWARE] Network DOWN\n");
 		serverStatus = SERVER_SHUTDOWN;
 	}
 }
@@ -61,13 +61,13 @@ void vApplicationPingReplyHook(ePingReplyStatus_t eStatus,
 		 RTOS task - blocking in this function will block the TCP/IP RTOS task. */
 		//xQueueSend( xPingReplyQueue, &usIdentifier, 10 / portTICK_PERIOD_MS );
 		//TODO - no idea how this is used or if it matters
-		printf("[HARDWARE] Ping response success\n");
+		threadSafePrintf("[HARDWARE] Ping response success\n");
 		break;
 
 	case eInvalidChecksum:
 	case eInvalidData:
 		/* A reply was received but it was not valid. */
-		printf("[HARDWARE] Ping response failure\n");
+		threadSafePrintf("[HARDWARE] Ping response failure\n");
 		break;
 	}
 }
@@ -92,10 +92,10 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 
 void NetworkingInit() {
 	/* Initialise the TCP/IP stack. */
-	printf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
+	threadSafePrintf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
 	FreeRTOS_IPInit(curSettings.ucIPAddress, curSettings.ucNetMask, curSettings.ucGatewayAddress,
 			curSettings.ucDNSServerAddress, ucMACAddress);
-	printf("[HARDWARE] FreeRTOS TCP-IP Stack Init Complete\n");
+	threadSafePrintf("[HARDWARE] FreeRTOS TCP-IP Stack Init Complete\n");
 }
 
 void NetworkingPeriodic() {

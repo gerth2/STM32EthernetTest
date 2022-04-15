@@ -28,7 +28,7 @@ void mpu60x0_init(I2C_HandleTypeDef i2cHandle){
 
 	uint8_t Data;
 
-	printf("[IMU] Starting Init...\n");
+	threadSafePrintf("[IMU] Starting Init...\n");
 
 	imu_i2c = i2cHandle;
 
@@ -59,9 +59,9 @@ void mpu60x0_init(I2C_HandleTypeDef i2cHandle){
 		Data = 0b00001000;
 		checkStatus(HAL_I2C_Mem_Write(&imu_i2c, MPU6050_ADDR, GYRO_CONFIG_REG, 1, &Data, 1, 1000));
 
-		printf("[IMU] Init Complete\n");
+		threadSafePrintf("[IMU] Init Complete\n");
 	} else {
-		printf("[IMU] Init FAIL\n");
+		threadSafePrintf("[IMU] Init FAIL\n");
 	}
 	return;
 
@@ -135,7 +135,7 @@ static void mpu60x0_checkWhoami(){
 	if (check == BITS_WHOAMI_EXP){  // 0x68 will be returned by the sensor if everything goes well
 		deviceAvailable = 1;
 	} else {
-		printf("[IMU] unexpected WHOAMI response of %d\n", check);
+		threadSafePrintf("[IMU] unexpected WHOAMI response of %d\n", check);
 	}
 
 }
@@ -146,25 +146,25 @@ static void checkStatus(HAL_StatusTypeDef status) {
 	case HAL_OK:
 		break;
 	case HAL_BUSY:
-		printf("[IMU] PANIC: I2C: busy state occured at %s, line %d .\n", __FILE__,
+		threadSafePrintf("[IMU] PANIC: I2C: busy state occured at %s, line %d .\n", __FILE__,
 				__LINE__);
 		while (1)
 			;
 		break;
 	case HAL_TIMEOUT:
-		printf("[IMU] PANIC: I2C: transmit/receive timeout occured at %s, line %d .\n",
+		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive timeout occured at %s, line %d .\n",
 				__FILE__, __LINE__);
 		while (1)
 			;
 		break;
 	case HAL_ERROR:
-		printf("[IMU] PANIC: I2C: transmit/receive error at %s, line %d.\n", __FILE__,
+		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive error at %s, line %d.\n", __FILE__,
 				__LINE__);
 		while (1)
 			;
 		break;
 	default:
-		printf("[IMU] PANIC: I2C: transmit/receive WUT HAPPEND at %s, line %d.\n",
+		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive WUT HAPPEND at %s, line %d.\n",
 				__FILE__, __LINE__);
 		while (1)
 			;

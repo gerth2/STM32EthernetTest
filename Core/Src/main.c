@@ -149,14 +149,14 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  printf("[MAIN] User Init Started...\n");
+  threadSafePrintf("[MAIN] User Init Started...\n");
   timeInit();
   RetargetInit(&huart1);
   fusion_reset();
   settings_init();
   NetworkingInit();
   mpu60x0_init(hi2c1);
-  printf("[MAIN] User Init Completed!\n");
+  threadSafePrintf("[MAIN] User Init Completed!\n");
 
 
   /* USER CODE END 2 */
@@ -472,7 +472,7 @@ void StartTask_10ms(void *argument)
 	const TickType_t xFrequency = (TickType_t) round(0.010 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 
-	printf("[MAIN] Starting 10ms task\n");
+	threadSafePrintf("[MAIN] Starting 10ms task\n");
 	/* Infinite loop */
 	for (;;) {
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -499,7 +499,7 @@ void StartTask_Server(void *argument)
 	TickType_t xLastWakeTime;
 	const TickType_t xFrequency = (TickType_t) round(0.01 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
-	printf("[MAIN] Starting Server task\n");
+	threadSafePrintf("[MAIN] Starting Server task\n");
 
 	/* Infinite loop */
 
@@ -562,7 +562,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: threadSafePrintf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

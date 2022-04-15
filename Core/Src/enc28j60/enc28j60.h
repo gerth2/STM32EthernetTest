@@ -11,6 +11,7 @@ extern "C" {
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
 #include "main.h"
+#include "debugUtils.h"
 
 void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 xNetworkBufferDescriptor_t *pxGetNetworkBufferWithDescriptor( size_t xRequestedSizeBytes, TickType_t xBlockTimeTicks );
