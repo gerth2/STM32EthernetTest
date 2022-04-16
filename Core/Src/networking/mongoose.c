@@ -1235,7 +1235,7 @@ void mg_http_write_chunk(struct mg_connection *c, const char *buf, size_t len) {
 }
 
 // clang-format off
-static const char *mg_http_status_code_str(int status_code) {
+const char *mg_http_status_code_str(int status_code) {
   switch (status_code) {
     case 100: return "Continue";
     case 101: return "Switching Protocols";

@@ -10,6 +10,15 @@ struct mg_mgr mgr;
 //Forward declaraton from autogen file
 void handleHttpFileServe(struct mg_connection *c, void *ev_data);
 
+//Custom HTTP for sending gzip compressed stuff
+void gzip_http_reply(struct mg_connection *c, int code, const char *headers,
+                   const unsigned char * data, size_t len) {
+  mg_printf(c, "HTTP/1.1 %d %s\r\n%sContent-Length: %d\r\n\r\n", code,
+            mg_http_status_code_str(code), headers == NULL ? "" : headers, len);
+  mg_send(c, data, len > 0 ? (size_t) len : 0);
+
+}
+
 // Event handler for the listening connection.
 static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 	if (ev == MG_EV_HTTP_MSG) {

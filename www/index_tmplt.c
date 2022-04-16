@@ -1,9 +1,9 @@
 #include "server.h"
 #include "mongoose.h"
 
-static const char header_html[] = "content-type: text/html\r\n";
-static const char header_js[] = "content-type: text/javascript\r\n";
-static const char header_css[] = "content-type: text/css\r\n";
+static const char header_html[] = "content-type:text/html\r\ncontent-encoding:gzip\r\n";
+static const char header_js[] = "content-type:text/javascript\r\ncontent-encoding:gzip\r\n";
+static const char header_css[] = "content-type:text/css\r\ncontent-encoding:gzip\r\n";
 
 $pageData
 
