@@ -451,8 +451,9 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(100);
+		osDelay(500);
 		mdns_update(); //currently this function blocks like foreverz so...it's here.
+		threadSafePrintf("[STATS]: Free Heap: %d \n", perfmon_getFreeHeap());
 
 	}
   /* USER CODE END 5 */

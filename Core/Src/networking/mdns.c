@@ -137,6 +137,8 @@ static uint8_t compareAddresses(uint8_t ip_a[IP_LEN], uint8_t ip_b[IP_LEN]){
 	return (memcmp(ip_a, ip_b, IP_LEN) == 0);
 }
 
+TickType_t timeout_ms = 0;
+
 uint8_t begin(
 	const char* szInstance,
 	const char* szService,
@@ -146,6 +148,7 @@ uint8_t begin(
 {
 	_port = port;
 	_ttlSeconds = ttlSeconds;
+
 
 	uint8_t n = 0;
 
@@ -171,6 +174,19 @@ uint8_t begin(
         	threadSafePrintf("[MDNS] Socket bind failed. MDNS not available.\n");
         	return 2;
         }
+
+        //Set the socket timeouts to zero so it's non-blocking
+        FreeRTOS_setsockopt( mdnsSocket,
+                            0,                   /* Not used. */
+                            FREERTOS_SO_RCVTIMEO,/* Setting receive timeout. */
+                            &timeout_ms, /* The timeout value. */
+                            0 );                 /* Not used. */
+
+        FreeRTOS_setsockopt( mdnsSocket,
+                            0,                   /* Not used. */
+                            FREERTOS_SO_SNDTIMEO,/* Setting send timeout. */
+                            &timeout_ms,    /* The timeout value. */
+                            0 );                 /* Not used. */
     }
     else
     {

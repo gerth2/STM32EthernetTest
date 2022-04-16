@@ -21,6 +21,8 @@ BaseType_t xNetworkInterfaceInitialise( void )
 BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescriptor,
                                     BaseType_t xReleaseAfterSend )
 {
+	taskENTER_CRITICAL();
+
     enc28j60_send_packet(pxDescriptor->pucEthernetBuffer, pxDescriptor->xDataLength );
 
     //threadSafePrintf("FreeRTOS: Packet forwarded to driver for transmiting...\n");
@@ -31,6 +33,9 @@ BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescrip
     {
         vReleaseNetworkBufferAndDescriptor( pxDescriptor );
     }
+
+	taskEXIT_CRITICAL();
+
 
     return pdTRUE;
 }

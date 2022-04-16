@@ -35,6 +35,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+// Chosen chip settings referenced from the linux kernel driver for this chip
+// https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/enc28j60.c
 uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	uint32_t i;
 
@@ -57,7 +59,7 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 
 	uint8_t revid = enc28j60_rcr(EREVID);
 	threadSafePrintf("[MAC] Got hardware revision %d\n", revid);
-	if(revid < 5){
+	if(revid == 0x00 || revid == 0xFF){
 		threadSafePrintf("[MAC] Init FAIL! Invalid hardware revision \n");
 		return -1;
 	}
@@ -83,8 +85,11 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	MACON3_PADCFG0 | MACON3_PADCFG2 | // Enable padding and automatic vlan frames recognition
 			MACON3_TXCRCEN | MACON3_FRMLNEN | MACON3_FULDPX); // Enable crc & frame len chk
 	enc28j60_wcr16(MAMXFL, ENC28J60_MAXFRAME);
-	enc28j60_wcr(MABBIPG, 0x15); // Set inter-frame gap
+
+	// Set inter-frame gap
 	enc28j60_wcr(MAIPGL, 0x12);
+	enc28j60_wcr(MABBIPG, 0x15);
+
 	enc28j60_wcr(MAIPGH, 0x0c); // ICE
 	enc28j60_wcr(MAADR5, macadr[0]); // Set MAC address
 	enc28j60_wcr(MAADR4, macadr[1]);
@@ -107,9 +112,11 @@ uint8_t enc28j60_init(uint8_t *macadr, SPI_HandleTypeDef spiToUse) {
 	// and transmit and receive error interrupt
 	enc28j60_bfs(EIE,
 			EIE_INTIE | EIE_TXIE | EIE_PKTIE | EIE_TXERIE | EIE_RXERIE);
-	// Enable Rx packets
 
-	enc28j60_wcr(ERXFCON, 0x00); // promiscuous mode - pass all packets
+	//Set up packet filtering - mirror linux's multicast mode
+	enc28j60_wcr(ERXFCON, ERXFCON_UCEN | ERXFCON_CRCEN | ERXFCON_BCEN | ERXFCON_MCEN );
+
+	// Enable Rx packets
 	enc28j60_bfs(ECON1, ECON1_RXEN);
 
 	threadSafePrintf("[MAC] Init Complete!\n");
@@ -147,6 +154,9 @@ uint16_t enc28j60_recv_packet(uint8_t *buf, uint16_t buflen) {
 }
 
 void prvReceivePacket(void *buf, uint32_t pktlen) {
+
+	taskENTER_CRITICAL();
+
 	enc28j60_bfc(EIE, EIE_INTIE); // mask enc28j60 interrupts
 
 	volatile uint8_t eir_flags = enc28j60_rcr(EIR);
@@ -235,6 +245,9 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 	}
 
 	enc28j60_bfs(EIE, EIE_INTIE); // unmask enc28j60 interrupts
+
+	taskEXIT_CRITICAL();
+
 }
 
 void enc28j60_send_packet(uint8_t *data, uint16_t len) {
@@ -369,8 +382,7 @@ static void enc28j60_soft_reset() {
 	enc28j60_release();
 
 	enc28j60_current_bank = 0;
-	HAL_Delay(5);
-	//_delay_ms(1); // Wait until device initializes
+	HAL_Delay(20); //Wait for full device init
 }
 
 static uint8_t enc28j60_txrx_byte(uint8_t data) {
