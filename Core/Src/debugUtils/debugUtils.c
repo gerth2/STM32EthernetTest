@@ -80,8 +80,10 @@ int my_vfprintf(FILE *file, char const *fmt, va_list arg) {
 
                 /* %x: print out an int in hex  */
                 case 'x':
+                case 'X':
                     int_temp = va_arg(arg, int);
                     utoa(int_temp, buffer, 16);
+                    safePutS("0x");
                     safePutS(buffer);
                     length += strlen(buffer);
                     break;

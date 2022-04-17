@@ -507,7 +507,7 @@ static __inline struct tm *localtime_r(const time_t *t, struct tm *tm) {
 
 // Granularity of the send/recv IO buffer growth
 #ifndef MG_IO_SIZE
-#define MG_IO_SIZE 2048
+#define MG_IO_SIZE 256
 #endif
 
 // Maximum size of the recv IO buffer
