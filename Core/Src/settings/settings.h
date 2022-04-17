@@ -11,6 +11,7 @@ typedef struct UserSettings {
   uint8_t ucNetMask[4];
   uint8_t ucGatewayAddress[4];
   uint8_t ucDNSServerAddress[4];
+  uint8_t nt4ServerAddress[4];
 } userSettings;
 
 

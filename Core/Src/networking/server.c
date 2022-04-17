@@ -50,7 +50,7 @@ void periodicWSDataSend(void){
 	char txString[256];
 	int strlen;
 
-	strlen = sprintf(txString, "{\"time\":%lf, \"accelX\":%f, \"accelY\":%f, \"accelZ\":%f, \"gyroX\":%f, \"gyroY\":%f, \"gyroZ\":%f, \"yaw\":%f, \"heapFree\":%d}",
+	strlen = sprintf(txString, "{\"msgType\":\"newData\",\"time\":%lf,\"accelX\":%f,\"accelY\":%f,\"accelZ\":%f,\"gyroX\":%f,\"gyroY\":%f,\"gyroZ\":%f,\"yaw\":%f,\"heapFree\":%d}",
 			fusion_getSampleTime(),
 			fusion_getXAccel(),
 			fusion_getYAccel(),

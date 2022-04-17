@@ -71,12 +71,69 @@
         <hr>
       </div>
       
+      <!-------------------------------------------------------------------------------------->
       <div id="Graphs" class="tabcontent">
         <h3>Graphs still TODO</h3>
       </div>
       
+      <!-------------------------------------------------------------------------------------->
       <div id="Settings" class="tabcontent">
-        <h3>Settings still TODO</h3>
+        <table> 
+            <tr>
+                <td>
+                    <label for="name">Device Name</label>
+                </td>
+                <td>
+                    <input type="text" id="deviceName" name="deviceName" required minlength="1" maxlength="15" size="10">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name">Device IP</label>
+                </td>
+                <td>
+                    <input type="text" id="deviceIP" name="deviceIP" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name">Device Subnet Mask</label>
+                </td>
+                <td>
+                    <input type="text" id="deviceSubnet" name="deviceSubnet" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">                                                
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name">Device Gateway IP</label>
+                </td>
+                <td>
+                    <input type="text" id="deviceGateway" name="deviceGateway" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">                                                
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name">NT4 Server IP</label>
+                </td>
+                <td>
+                    <input type="text" id="ntServerIP" name="ntServerIP" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$"> 
+                </td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <table>
+            <tr>
+                <td>
+                    <button onclick="onSettingsReset()">Reset</button> 
+                </td>
+                <td>
+                    <button onclick="onSettingsSubmit()">Submit</button> 
+                </td>
+            </tr>
+        </table>
+    
       </div>
 
     
