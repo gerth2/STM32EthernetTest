@@ -34,7 +34,7 @@ class FileContents():
 
             self.fileContentsStr = json.dumps(minContents)
 
-            self.gzipBytes = self.gzipCompress(self.fileContentsStr.encode("utf-8"))
+            self.gzipBytes = self.gzipCompress(minContents.encode("utf-8").strip(b"\""))
 
             print("orig size: {}".format(len(fileContents)))
             print("minimized: {}".format(len(self.fileContentsStr)))
