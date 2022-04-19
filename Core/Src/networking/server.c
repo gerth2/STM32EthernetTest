@@ -66,7 +66,7 @@ void periodicWSDataSend(void){
 	//For all connections in list...
 	while(c != NULL){
 
-		if(c->is_websocket){
+		if(c->is_websocket && c->is_writable){
 			//For all websockets, send the data
 			mg_ws_send(c, txString, strlen, WEBSOCKET_OP_TEXT);
 		}
@@ -108,8 +108,8 @@ void serverUpdate(void) {
 	}
 
 	if (serverIsRunning) {
-		mg_mgr_poll(&mgr, 1000);   // Event loop
 		periodicWSDataSend();
+		mg_mgr_poll(&mgr, 1000);   // Event loop
 	}
 }
 

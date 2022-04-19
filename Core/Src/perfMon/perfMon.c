@@ -17,8 +17,7 @@ void perfmon_printHeapStats(){
 	threadSafePrintf("[PERFMON] Max Free Block: %d\n", tmp.xSizeOfLargestFreeBlockInBytes);
 	threadSafePrintf("[PERFMON] Min Free Block: %d\n", tmp.xSizeOfSmallestFreeBlockInBytes);
 	threadSafePrintf("[PERFMON] Low Water Mark: %d\n", tmp.xMinimumEverFreeBytesRemaining);
-	threadSafePrintf("[PERFMON] Allocs: %d\n", tmp.xNumberOfSuccessfulAllocations);
-	threadSafePrintf("[PERFMON] Frees: %d\n", tmp.xNumberOfSuccessfulFrees);
+	threadSafePrintf("[PERFMON] Unfreed Allocs: %d\n", tmp.xNumberOfSuccessfulAllocations - tmp.xNumberOfSuccessfulFrees);
 	threadSafePrintf("[PERFMON]===============================\n");
 
 

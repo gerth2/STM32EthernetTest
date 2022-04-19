@@ -778,9 +778,10 @@ void mdns_update(){
 	}
 
 	advertise_counter++;
-	if(advertise_counter > 200){
+	if(advertise_counter > 200 && total_advertisements < 8){
 		advertise();
 		advertise_counter = 0;
+		total_advertisements++;
 	}
 
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
