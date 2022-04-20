@@ -5,16 +5,15 @@
 #include <stdint.h>
 #include "timeManager.h"
 #include "math.h"
+#include "runningCal.h"
 
 void fusion_reset();
 
 void fusion_update(void);
 
-void fusion_startCalibration(void);
-
-uint8_t fusion_calIsActive(void);
-
 float fusion_getYaw(void);
+float fusion_getPitch(void);
+float fusion_getRoll(void);
 
 float fusion_getXAccel();
 float fusion_getYAccel();

@@ -453,7 +453,7 @@ void StartDefaultTask(void *argument)
 	for (;;) {
 		osDelay(100);
 		mdns_update(); //currently this function blocks like foreverz so...it's here.
-		perfmon_printHeapStats();
+		//perfmon_printHeapStats();
 	}
   /* USER CODE END 5 */
 }
@@ -497,7 +497,7 @@ void StartTask_Server(void *argument)
   /* USER CODE BEGIN StartTask_Server */
 
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.02 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.1 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 	threadSafePrintf("[MAIN] Starting Server task\n");
 

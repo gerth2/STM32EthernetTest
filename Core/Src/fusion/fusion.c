@@ -1,16 +1,6 @@
 
 #include "fusion.h"
 
-//Cal result biases for transforming from raw sensor to calibrated sensor
-float gyroXBias = 0;
-float gyroYBias = 0;
-float gyroZBias = 0;
-
-float accelXBias = 0;
-float accelYBias = 0;
-float accelZBias = 0;
-float accelNormalize = 1.0;
-
 // Calibration-corrected imu values
 float calAdjGyroX = 0;
 float calAdjGyroY = 0;
@@ -21,92 +11,87 @@ float calAdjAccelZ = 0;
 
 //Fused pose estimates
 float yaw = 0;
+float roll = 0;
+float pitch = 0;
 
-
-//Calibration infrastructure
-#define CAL_SAMPLES 500.0
-uint16_t calStep = 0;
-
-float calGyroXAccum = 0;
-float calGyroYAccum = 0;
-float calGyroZAccum = 0;
-
-float calAccelXAccum = 0;
-float calAccelYAccum = 0;
-float calAccelZAccum = 0;
+//Complimentary filter calibrations
+float compFilt_accel_trust_factor = 0.02;
+float compFilt_min_accel = 0.7;
+float compFilt_max_accel = 2.5;
 
 float sampleTime = 0;
-
 float prevSampleTime = -1;
 
-#define CAL_EXPECTED_GYRO_X 0
-#define CAL_EXPECTED_GYRO_Y 0
-#define CAL_EXPECTED_GYRO_Z 0
-#define CAL_EXPECTED_ACCEL_X 0
-#define CAL_EXPECTED_ACCEL_Y 0
-#define CAL_EXPECTED_ACCEL_Z 1.0
-#define CAL_EXPECTED_ACCEL_NORM 1.0
 
 void fusion_reset(){
 	yaw = 0;
 	prevSampleTime = -1;
+	calInit();
 }
 
+float wrapAngle (float in){
+	if(in > 180.0){
+		return in - 360;
+	} else if (in < -180.0) {
+		return in + 360.0;
+	} else {
+		return in;
+	}
+}
 
 void fusion_update(){
 
 	sampleTime = mpu60x0_getSampleTime();
 
-	if(fusion_calIsActive()){
-		//calibration mode
-		calStep++;
-		calGyroXAccum += mpu60x0_getXGyro()/ CAL_SAMPLES;
-		calGyroYAccum += mpu60x0_getYGyro()/ CAL_SAMPLES;
-		calGyroZAccum += mpu60x0_getZGyro()/ CAL_SAMPLES;
+	calUpdate(mpu60x0_getXGyro(), mpu60x0_getYGyro(), mpu60x0_getZGyro(), mpu60x0_getXAccel(), mpu60x0_getYAccel(), mpu60x0_getZAccel());
 
-		calAccelXAccum += mpu60x0_getXAccel()/ CAL_SAMPLES;
-		calAccelYAccum += mpu60x0_getYAccel()/ CAL_SAMPLES;
-		calAccelZAccum += mpu60x0_getZAccel()/ CAL_SAMPLES;
+	//Apply sensor calibration to readings
+	calAdjGyroX = cal_applyGyroX(mpu60x0_getXGyro());
+	calAdjGyroY = cal_applyGyroY(mpu60x0_getYGyro());
+	calAdjGyroZ = cal_applyGyroZ(mpu60x0_getZGyro());
+	calAdjAccelX = cal_applyAccelX(mpu60x0_getXAccel());
+	calAdjAccelY = cal_applyAccelY(mpu60x0_getYAccel());
+	calAdjAccelZ = cal_applyAccelZ(mpu60x0_getZAccel());
 
+	//Complementary Filters
+	if(prevSampleTime > 0){
+		//Loop Time
+		float deltaTime = (sampleTime - prevSampleTime);
 
-		if(!fusion_calIsActive()){
-			//Transition out of active to inactive
-			fusion_reset();
-			gyroXBias = CAL_EXPECTED_GYRO_X - calGyroXAccum;
-			gyroYBias = CAL_EXPECTED_GYRO_Y - calGyroYAccum;
-			gyroZBias = CAL_EXPECTED_GYRO_Z - calGyroZAccum;
+		//Accumulate gyro
+		pitch += calAdjGyroX * deltaTime;
+		roll += calAdjGyroY * deltaTime;
+		yaw += calAdjGyroZ * deltaTime;
 
-			accelXBias = CAL_EXPECTED_ACCEL_X - calAccelXAccum;
-			accelYBias = CAL_EXPECTED_ACCEL_Y - calAccelYAccum;
-			accelZBias = CAL_EXPECTED_ACCEL_Z - calAccelZAccum;
-			accelNormalize = CAL_EXPECTED_ACCEL_NORM / (float) sqrt(calAccelXAccum*calAccelXAccum +
-																	calAccelYAccum*calAccelYAccum +
-																	calAccelZAccum*calAccelZAccum);
+		//Wrap Angles
+		pitch = wrapAngle(pitch);
+		roll = wrapAngle(roll);
+		yaw = wrapAngle(yaw);
+
+		//Pitch Complementary Filter
+		double accelForPitch = sqrt(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
+		if(accelForPitch > compFilt_min_accel && accelForPitch < compFilt_max_accel){
+			pitch = pitch * (1.0 - compFilt_accel_trust_factor) + atan2(calAdjAccelY, calAdjAccelZ) * 180/3.14159 * compFilt_accel_trust_factor;
 		}
+
+		//Roll Complementary Filter
+		double accelForRoll = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelZ*calAdjAccelZ);
+		if(accelForRoll > compFilt_min_accel && accelForRoll < compFilt_max_accel){
+			roll = roll * (1.0 - compFilt_accel_trust_factor) + atan2(calAdjAccelX, calAdjAccelZ) * 180/3.14159 * compFilt_accel_trust_factor;
+		}
+
+		//Yaw Complementary Filter
+		double accelForYaw = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelY*calAdjAccelY);
+		if(accelForYaw > compFilt_min_accel && accelForYaw < compFilt_max_accel){
+			yaw = yaw * (1.0 - compFilt_accel_trust_factor) + atan2(calAdjAccelX, calAdjAccelY) * 180/3.14159 * compFilt_accel_trust_factor;
+		}
+
 
 	} else {
-		//Normal mode
-
-		if(prevSampleTime > 0){
-
-			//Correct Gyro Readings
-			float deltaTime = (sampleTime - prevSampleTime);
-			calAdjGyroX = (mpu60x0_getXGyro() + gyroXBias);
-			calAdjGyroY = (mpu60x0_getYGyro() + gyroYBias);
-			calAdjGyroZ = (mpu60x0_getZGyro() + gyroZBias);
-			calAdjAccelX = (mpu60x0_getXAccel() + accelXBias) * accelNormalize;
-			calAdjAccelY = (mpu60x0_getYAccel() + accelYBias) * accelNormalize;
-			calAdjAccelZ = (mpu60x0_getZAccel() + accelZBias) * accelNormalize;
-
-			//Fuse
-			yaw += calAdjGyroZ * deltaTime;;
-
-		} else {
-			//skip - first sample, need at least two samples for delta time
-		}
-
-		prevSampleTime = sampleTime;
+		//skip - first sample, need at least two samples for delta time
 	}
+
+	prevSampleTime = sampleTime;
 
 }
 
@@ -138,14 +123,12 @@ float fusion_getSampleTime(){
 	return sampleTime;
 }
 
-
-
-void fusion_startCalibration(){
-	calStep = 0;
+float fusion_getPitch(void){
+	return pitch;
 }
 
-uint8_t fusion_calIsActive(){
-	return (calStep < CAL_SAMPLES);
+float fusion_getRoll(void){
+	return roll;
 }
 
 float fusion_getYaw(void){
