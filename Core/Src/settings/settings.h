@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <ctype.h>
+#include "debugUtils.h"
+#include "mjson.h"
 
 
 typedef struct UserSettings {
@@ -20,5 +23,7 @@ extern userSettings curSettings;
 
 void settings_init(void);
 void settings_save(void);
+void settings_getCurSettingsAsJson(char * buf);
+void settings_parseSettingsFromJson(char * buf, int len);
 
 #endif

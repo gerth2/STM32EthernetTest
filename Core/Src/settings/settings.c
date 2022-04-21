@@ -37,6 +37,63 @@ void settings_getCurSettingsAsJson(char * buf){
 
 }
 
-void settings_parseSettingsFromJson(char * buf){
+// from https://stackoverflow.com/questions/9211601/parsing-ip-adress-string-in-4-single-bytes
+void parseIPString(uint8_t * dst, char * str){
+    size_t index = 0;
 
+    dst[0] = 0;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+
+    while (*str) {
+        if (isdigit((unsigned char)*str)) {
+        	dst[index] *= 10;
+        	dst[index] += *str - '0';
+        } else {
+            index++;
+        }
+        str++;
+    }
+}
+
+void settings_parseSettingsFromJson(char * buf, int len){
+	char tmpStr[35];
+	int resStrLen;
+
+	resStrLen = mjson_get_string(buf, len, "$.deviceName", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new deviceName %s\n", tmpStr);
+		strcpy(curSettings.deviceName, tmpStr);
+	}
+
+	resStrLen = mjson_get_string(buf, len, "$.ucIPAddress", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new ucIPAddress %s\n", tmpStr);
+		parseIPString(curSettings.ucIPAddress, tmpStr);
+	}
+
+	resStrLen = mjson_get_string(buf, len, "$.ucNetMask", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new ucNetMask %s\n", tmpStr);
+		parseIPString(curSettings.ucNetMask, tmpStr);
+	}
+
+	resStrLen = mjson_get_string(buf, len, "$.ucGatewayAddress", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new ucGatewayAddress %s\n", tmpStr);
+		parseIPString(curSettings.ucGatewayAddress, tmpStr);
+	}
+
+	resStrLen = mjson_get_string(buf, len, "$.ucDNSServerAddress", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new ucDNSServerAddress %s\n", tmpStr);
+		parseIPString(curSettings.ucDNSServerAddress, tmpStr);
+	}
+
+	resStrLen = mjson_get_string(buf, len, "$.nt4ServerAddress", tmpStr, 35);
+	if(resStrLen > 0){
+		threadSafePrintf("[SETTINGS] Got new nt4ServerAddress %s\n", tmpStr);
+		parseIPString(curSettings.nt4ServerAddress, tmpStr);
+	}
 }

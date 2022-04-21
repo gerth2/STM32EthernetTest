@@ -50,6 +50,18 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 void handleNewSettings(struct mg_connection *c, struct mg_http_message *ev_data){
 
 	threadSafePrintf("[SERVER]: Got new settings %s\n", ev_data->body.ptr);
+	settings_parseSettingsFromJson(ev_data->body.ptr, ev_data->body.len);
+
+
+
+	char respString[] = "{\"success\":\"true\"}";
+
+	// Send response to the client
+	mg_printf(c, "%s", "HTTP/1.0 200 OK\r\n");                  // Response line
+	mg_printf(c, "%s", "Content-Type: application/json\r\n");   // One header
+	mg_printf(c, "Content-Length: %d\r\n", (int) strlen(respString)); // Another header
+	mg_printf(c, "%s", "\r\n");                                 // End of headers
+	mg_printf(c, "%s", respString);                             // Body
 }
 
 

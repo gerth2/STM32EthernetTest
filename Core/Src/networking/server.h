@@ -21,5 +21,7 @@
 void serverInit(void);
 void serverUpdate(void);
 void serverShutdown(void);
+void gzip_http_reply(struct mg_connection *c, int code, const char *headers, const unsigned char * data, size_t len) ;
+
 
 #endif
