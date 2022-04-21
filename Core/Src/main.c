@@ -497,7 +497,7 @@ void StartTask_Server(void *argument)
   /* USER CODE BEGIN StartTask_Server */
 
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.05 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.01 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 	threadSafePrintf("[MAIN] Starting Server task\n");
 

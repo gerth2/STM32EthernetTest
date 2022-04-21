@@ -15,27 +15,25 @@ void RetargetInit(UART_HandleTypeDef *huart) {
 static void ftoa_fixed(char *buffer, double value);
 static void ftoa_sci(char *buffer, double value);
 
-void safePutC(char in){
-    taskENTER_CRITICAL();
-    HAL_UART_Transmit(gHuart, (uint8_t *) &in, 1, HAL_MAX_DELAY);
-    taskEXIT_CRITICAL();
+static void safePutC(char **buf, char in){
+	**buf = in;
+	*buf += 1;
 }
 
-void safePutS(char * str_in){
-    taskENTER_CRITICAL();
-    HAL_UART_Transmit(gHuart, (uint8_t *) str_in, strlen(str_in), HAL_MAX_DELAY);
-    taskEXIT_CRITICAL();
+static void safePutS(char **buf, char * str_in){
+	memcpy(*buf, str_in, strlen(str_in));
+	*buf += strlen(str_in);
 }
 
-int my_vfprintf(FILE *file, char const *fmt, va_list arg) {
+int my_vfprintf(char *buf, char const *fmt, va_list arg) {
 
     int int_temp;
     char char_temp;
     char *string_temp;
     double double_temp;
+    char * bufStart = buf;
 
     char ch;
-    int length = 0;
 
     char buffer[128];
 
@@ -44,38 +42,33 @@ int my_vfprintf(FILE *file, char const *fmt, va_list arg) {
             switch (ch = *fmt++) {
                 /* %% - print out a single %    */
                 case '%':
-                	safePutC('%');
-                    length++;
+                	safePutC(&buf, '%');
                     break;
 
                 /* %c: print out a character    */
                 case 'c':
                     char_temp = va_arg(arg, int);
-                    safePutC(char_temp);
-                    length++;
+                    safePutC(&buf, char_temp);
                     break;
 
                 /* %s: print out a string       */
                 case 's':
                     string_temp = va_arg(arg, char *);
-                    safePutS(string_temp);
-                    length += strlen(string_temp);
+                    safePutS(&buf, string_temp);
                     break;
 
                 /* %d: print out an int         */
                 case 'd':
                     int_temp = va_arg(arg, int);
                     itoa(int_temp, buffer, 10);
-                    safePutS(buffer);
-                    length += strlen(buffer);
+                    safePutS(&buf, buffer);
                     break;
 
 				/* %u: print out an unsigned int         */
 				case 'u':
 					int_temp = va_arg(arg, int);
 					utoa(int_temp, buffer, 10);
-					safePutS(buffer);
-					length += strlen(buffer);
+					safePutS(&buf, buffer);
 					break;
 
                 /* %x: print out an int in hex  */
@@ -83,35 +76,37 @@ int my_vfprintf(FILE *file, char const *fmt, va_list arg) {
                 case 'X':
                     int_temp = va_arg(arg, int);
                     utoa(int_temp, buffer, 16);
-                    safePutS("0x");
-                    safePutS(buffer);
-                    length += strlen(buffer);
+                    safePutS(&buf, "0x");
+                    safePutS(&buf, buffer);
                     break;
 
                 case 'f':
-                    double_temp = va_arg(arg, double);
+                	double_temp = va_arg(arg, double);
                     ftoa_fixed(buffer, double_temp);
-                    safePutS(buffer);
-                    length += strlen(buffer);
+                    safePutS(&buf, buffer);
                     break;
 
                 case 'e':
                     double_temp = va_arg(arg, double);
                     ftoa_sci(buffer, double_temp);
-                    safePutS(buffer);
-                    length += strlen(buffer);
+                    safePutS(&buf, buffer);
                     break;
+
+
             }
-        }
-        else {
-        	safePutC(ch);
-            length++;
+        }  else {
+        	//No formatting, just copy
+        	safePutC(&buf, ch);
         }
     }
-    return length;
+
+    //unconditionally inject null terminator
+    *buf = 0x00;
+
+    return buf - bufStart;
 }
 
-int normalize(double *val) {
+static int normalize(double *val) {
     int exponent = 0;
     double value = *val;
 
@@ -184,7 +179,6 @@ static void ftoa_fixed(char *buffer, double value) {
 
 void ftoa_sci(char *buffer, double value) {
     int exponent = 0;
-    int places = 0;
     static const int width = 4;
 
     if (value == 0.0) {
@@ -217,17 +211,33 @@ void ftoa_sci(char *buffer, double value) {
     itoa(exponent, buffer, 10);
 }
 
+int threadSafeSPrintf(char * buf, const char *fmt, ...) {
+    va_list arg;
+    int length;
 
-void threadSafePrintf(const char *fmt, ...) {
-    va_list args;
+    va_start(arg, fmt);
+    length = my_vfprintf(buf, fmt, arg);
+    va_end(arg);
+
+    return length;
+}
+
+
+int threadSafePrintf(const char *fmt, ...) {
 
     //return; //uncomment this to stop support for all print statments
     va_list arg;
     int length;
 
+    char buf[256];
+
     va_start(arg, fmt);
-    length = my_vfprintf(stdout, fmt, arg);
+    length = my_vfprintf(buf, fmt, arg);
     va_end(arg);
+
+    taskENTER_CRITICAL();
+    HAL_UART_Transmit(gHuart, (uint8_t *) &buf, strlen(buf), HAL_MAX_DELAY);
+    taskEXIT_CRITICAL();
 
     return length;
 }
