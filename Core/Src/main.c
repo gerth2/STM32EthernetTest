@@ -28,6 +28,7 @@
 #include "mpu60x0.h"
 #include "fusion.h"
 #include "settings.h"
+#include "eeprom.h"
 
 /* USER CODE END Includes */
 
@@ -139,6 +140,14 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
+  // Seems like I2C peripherial gets stuck in a bad state on startup sometimes. Force it into a good state.
+  __HAL_RCC_I2C1_CLK_ENABLE();
+    HAL_Delay(100);
+    __HAL_RCC_I2C1_FORCE_RESET();
+    HAL_Delay(100);
+    __HAL_RCC_I2C1_RELEASE_RESET();
+    HAL_Delay(100);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -150,6 +159,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   threadSafePrintf("[MAIN] User Init Started...\n");
+  eeprom_initBlocks();
   timeInit();
   RetargetInit(&huart1);
   fusion_reset();

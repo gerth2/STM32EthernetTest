@@ -69,6 +69,8 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi1;
+extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim11;
 
 

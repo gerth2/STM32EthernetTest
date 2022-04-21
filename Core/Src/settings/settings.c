@@ -15,13 +15,25 @@ void copy_settings(userSettings * dst, userSettings * src){
 	memcpy(dst, src, sizeof(userSettings));
 }
 
+void settings_factoryReset(){
+	copy_settings(&curSettings, &dfltSettings);
+	settings_save();
+}
+
 void settings_init(){
-	copy_settings(&curSettings, &dfltSettings); //TODO read from EEPROM
+
+	int8_t result = eeprom_readBlock(EEPROM_SETTINGS_BID, &curSettings);
+	if(result != 0){
+		threadSafePrintf("[SETTINGS] EEPROM Read failed, reverting to factory default.\n");
+		settings_factoryReset();
+	}
 }
 
 void settings_save(){
-	//TODO write to EEPROM
-	//TODO reboot?
+	int8_t result = eeprom_writeBlock(EEPROM_SETTINGS_BID, &curSettings);
+	if(result != 0){
+		threadSafePrintf("[SETTINGS] EEPROM Write failed!\n");
+	}
 }
 
 void settings_getCurSettingsAsJson(char * buf){
@@ -96,4 +108,6 @@ void settings_parseSettingsFromJson(char * buf, int len){
 		threadSafePrintf("[SETTINGS] Got new nt4ServerAddress %s\n", tmpStr);
 		parseIPString(curSettings.nt4ServerAddress, tmpStr);
 	}
+
+	settings_save();
 }
