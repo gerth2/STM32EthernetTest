@@ -134,7 +134,7 @@ static void ftoa_fixed(char *buffer, double value) {
 
     int exponent = 0;
     int places = 0;
-    static const int width = 4;
+    static const int width = 8;
 
     if (value == 0.0) {
         buffer[0] = '0';
@@ -179,7 +179,7 @@ static void ftoa_fixed(char *buffer, double value) {
 
 void ftoa_sci(char *buffer, double value) {
     int exponent = 0;
-    static const int width = 4;
+    static const int width = 5;
 
     if (value == 0.0) {
         buffer[0] = '0';

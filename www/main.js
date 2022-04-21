@@ -43,6 +43,11 @@ webSocket.onmessage = function (event) {
 	}
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Settings Handling
+
+
 function onSettingsReset(evt) {
 	getCurSettings();
 
@@ -50,21 +55,39 @@ function onSettingsReset(evt) {
 
 function onSettingsSubmit(evt) {
 
+	txData = {}
+
+	txData.deviceName = document.getElementById("deviceName").value;
+	txData.ucIPAddress = document.getElementById("ucIPAddress").value;
+	txData.ucNetMask = document.getElementById("ucNetMask").value;
+	txData.ucGatewayAddress = document.getElementById("ucGatewayAddress").value;
+	//txData.ucDNSServerAddress = document.getElementById("ucDNSServerAddress");
+	txData.nt4ServerAddress = document.getElementById("nt4ServerAddress").value;
+
+	newSettings = JSON.stringify(txData);
+
+	sendNewSettings(newSettings);
 
 }
 
-//settings
+curSettings_url = "http://" + window.location.hostname +":" + window.location.port + "/curSettings"
 
-settings_url = "http://" + window.location.hostname +":" + window.location.port + "/curSettings"
-
-function getCurSettings(evt) {
+function getCurSettings() {
 	var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
 		onRxCurSettings(xmlHttp.responseText);
     }
-    xmlHttp.open("GET", settings_url, true); // true for asynchronous 
+    xmlHttp.open("GET", curSettings_url, true); // true for asynchronous 
     xmlHttp.send(null);
+}
+
+newSettings_url = "http://" + window.location.hostname +":" + window.location.port + "/newSettings"
+
+function sendNewSettings(newSettings) {
+	var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", newSettings_url, true); // true for asynchronous 
+    xmlHttp.send(newSettings);
 }
 
 function onRxCurSettings(settings){
@@ -77,4 +100,14 @@ function onRxCurSettings(settings){
 	//document.getElementById("ucDNSServerAddress").value = rxData.ucDNSServerAddress;
 	document.getElementById("nt4ServerAddress").value = rxData.nt4ServerAddress;
 
+}
+
+function validateDeviceName(str_in){
+	var devNameRegex = new RegExp("[a-zA-Z_]*");
+	return devNameRegex.test(str_in);
+}
+
+function validateIpAddr(str_in){
+	var ipRegex = new RegExp("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+	return ipRegex.test(str_in);
 }

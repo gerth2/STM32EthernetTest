@@ -32,6 +32,8 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
 		} else if (mg_http_match_uri(hm, "/curSettings")) {
 			handleCurSettings(c, hm);
+		} else if (mg_http_match_uri(hm, "/newSettings")) {
+			handleNewSettings(c, hm);
 		} else {
 			handleHttpFileServe(c, hm);
 		}
@@ -44,6 +46,12 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
 	(void) fn_data;
 }
+
+void handleNewSettings(struct mg_connection *c, struct mg_http_message *ev_data){
+
+	threadSafePrintf("[SERVER]: Got new settings %s\n", ev_data->body.ptr);
+}
+
 
 void handleCurSettings(struct mg_connection *c, void *ev_data){
 	//Create the message to tx
