@@ -15,11 +15,13 @@ function selectTab(evt, tabName) {
 // Get the element with id="defaultOpen" and click on it
 document.getElementById("defaultOpen").click();
 
-url = "ws://" + window.location.hostname +":" + window.location.port + "/websocket"
-webSocket = new WebSocket(url);
+
+ws_url = "ws://" + window.location.hostname +":" + window.location.port + "/websocket"
+webSocket = new WebSocket(ws_url);
+
 
 webSocket.onopen = function (event) {
-	
+	getCurSettings();
 };
 
 webSocket.onmessage = function (event) {
@@ -36,15 +38,43 @@ webSocket.onmessage = function (event) {
 		document.getElementById("heapFree").innerHTML = rxData.heapFree;
 	} else if(rxData.msgType == "curSettings"){
 
+	} else {
+		console.log("Unknown message type " + rxData.msgType);
 	}
 }
 
 function onSettingsReset(evt) {
-
+	getCurSettings();
 
 }
 
 function onSettingsSubmit(evt) {
 
+
+}
+
+//settings
+
+settings_url = "http://" + window.location.hostname +":" + window.location.port + "/curSettings"
+
+function getCurSettings(evt) {
+	var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		onRxCurSettings(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", settings_url, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+function onRxCurSettings(settings){
+	rxData = JSON.parse(settings);
+
+	document.getElementById("deviceName").value = rxData.deviceName;
+	document.getElementById("ucIPAddress").value = rxData.ucIPAddress;
+	document.getElementById("ucNetMask").value = rxData.ucNetMask;
+	document.getElementById("ucGatewayAddress").value = rxData.ucGatewayAddress;
+	//document.getElementById("ucDNSServerAddress").value = rxData.ucDNSServerAddress;
+	document.getElementById("nt4ServerAddress").value = rxData.nt4ServerAddress;
 
 }

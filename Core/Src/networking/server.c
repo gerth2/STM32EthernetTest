@@ -9,6 +9,7 @@ struct mg_mgr mgr;
 
 //Forward declaraton from autogen file
 void handleHttpFileServe(struct mg_connection *c, void *ev_data);
+void handleCurSettings(struct mg_connection *c, void *ev_data);
 
 //Custom HTTP for sending gzip compressed stuff
 void gzip_http_reply(struct mg_connection *c, int code, const char *headers,
@@ -29,6 +30,8 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 			// Websocket connection, which will receive MG_EV_WS_MSG events.
 			mg_ws_upgrade(c, hm, NULL);
 
+		} else if (mg_http_match_uri(hm, "/curSettings")) {
+			handleCurSettings(c, hm);
 		} else {
 			handleHttpFileServe(c, hm);
 		}
@@ -41,6 +44,21 @@ static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
 	(void) fn_data;
 }
+
+void handleCurSettings(struct mg_connection *c, void *ev_data){
+	//Create the message to tx
+	char txString[256];
+	settings_getCurSettingsAsJson(txString);
+
+	// Send response to the client
+	mg_printf(c, "%s", "HTTP/1.0 200 OK\r\n");                  // Response line
+	mg_printf(c, "%s", "Content-Type: application/json\r\n");   // One header
+	mg_printf(c, "Content-Length: %d\r\n", (int) strlen(txString)); // Another header
+	mg_printf(c, "%s", "\r\n");                                 // End of headers
+	mg_printf(c, "%s", txString);                               // Body
+
+}
+
 
 void periodicWSDataSend(void){
 

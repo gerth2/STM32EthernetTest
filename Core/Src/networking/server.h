@@ -8,6 +8,7 @@
 #include "debugUtils.h"
 
 #include "mongoose.h"
+#include "mjson.h"
 #include "networking.h"
 #include "mdns.h"
 #include "timeManager.h"
