@@ -66,6 +66,10 @@ void statusLED_update(){
 			ledOFF();
 		}
 
+		if(patternStep >= PATTERN_LEN){
+			patternStep = 0;
+		}
+
 	}
 
 }
