@@ -1,19 +1,19 @@
 #include <statusLED.h>
 
 void ledOFF(){
-	 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_SET);
 }
 
 void ledON(){
-	 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_SET);
+	 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_RESET);
 }
 
 void statusLED_init(){
 	ledON();
 }
 
-//Produce a 100ms update rate from a 10ms call rate
-#define PERIODIC_CALL_DECIMATION 10
+//Produce a 40ms update rate from a 10ms call rate
+#define PERIODIC_CALL_DECIMATION 4
 uint8_t callCounter = 0;
 
 
@@ -22,10 +22,10 @@ uint8_t callCounter = 0;
 #define _ 0,
 #define X 1,
 
-#define PATTERN_LEN 10
-uint8_t pattern0[PATTERN_LEN] = {_ _ _ _ _ X X X X X};
-uint8_t pattern1[PATTERN_LEN] = {X _ X _ X _ X _ X _};
-uint8_t pattern2[PATTERN_LEN] = {X _ _ X _ _ _ _ _ _};
+#define PATTERN_LEN 40
+uint8_t pattern0[PATTERN_LEN] = {_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ X X X X X X X X X X X X X X X X X X X X };
+uint8_t pattern1[PATTERN_LEN] = {X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ X _ };
+uint8_t pattern2[PATTERN_LEN] = {X _ _ _ _ _ _ X _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _};
 
 #undef _
 #undef X

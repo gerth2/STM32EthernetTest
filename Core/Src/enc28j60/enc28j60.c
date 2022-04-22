@@ -263,7 +263,7 @@ void enc28j60_send_packet(uint8_t *data, uint16_t len) {
 		}
 
 		// If previous packet won't be sended within 100 ms, abort previous packet
-		if ((HAL_GetTick() - tickstart) > 100) {
+		if ((HAL_GetTick() - tickstart) > 1000) {
 			enc28j60_bfc(ECON1, ECON1_TXRTS);
 		}
 	}

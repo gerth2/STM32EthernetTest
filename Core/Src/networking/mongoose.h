@@ -229,6 +229,7 @@ static inline void *mg_calloc(int cnt, size_t size) {
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include "debugUtils.h"
 
 #include <FreeRTOS.h>
 #include <FreeRTOS_IP.h>
@@ -481,7 +482,7 @@ static __inline struct tm *localtime_r(const time_t *t, struct tm *tm) {
 #endif
 
 #ifndef MG_ENABLE_LOG
-#define MG_ENABLE_LOG 1
+#define MG_ENABLE_LOG 0
 #endif
 
 #ifndef MG_ENABLE_MD5
@@ -584,7 +585,7 @@ const char *mg_strstr(const struct mg_str haystack, const struct mg_str needle);
 #if MG_ENABLE_LOG
 #define LOG(level, args)                                                   \
   do {                                                                     \
-    if (mg_log_prefix((level), __FILE__, __LINE__, __func__)) mg_log args; \
+    if (mg_log_prefix((level), __FILE__, __LINE__, __func__)) {threadSafePrintf args; threadSafePrintf("\n");} \
   } while (0)
 enum { LL_NONE, LL_ERROR, LL_INFO, LL_DEBUG, LL_VERBOSE_DEBUG };
 bool mg_log_prefix(int ll, const char *file, int line, const char *fname);

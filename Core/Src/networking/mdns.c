@@ -745,7 +745,7 @@ void sendResponse(
         /* The data was successfully queued for sending.  128 bytes will have
         been copied out of ucBuffer and into a buffer inside the TCP/IP stack.
         ucBuffer can be re-used now. */
-    	threadSafePrintf("[MDNS] Response send success\n");
+    	//threadSafePrintf("[MDNS] Response send success\n");
     } else {
     	threadSafePrintf("[MDNS] Response send failure\n");
     }

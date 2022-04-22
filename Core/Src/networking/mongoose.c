@@ -2044,7 +2044,7 @@ bool mg_log_prefix(int level, const char *file, int line, const char *fname) {
                  fname);
     if (n < 0 || n > (int) sizeof(buf) - 2) n = sizeof(buf) - 2;
     while (n < (int) sizeof(buf) - 1) buf[n++] = ' ';
-    s_fn(buf, sizeof(buf) - 1, s_fn_param);
+    threadSafePrintf("%s", buf);
     return true;
   } else {
     return false;

@@ -10,8 +10,14 @@ void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNe
 
 BaseType_t xNetworkInterfaceInitialise( void )
 {
-    extern uint8_t ucMACAddress[ 6 ];
-    if ( enc28j60_init(ucMACAddress, hspi1 ) == 0) {
+    uint8_t retVal;
+
+	taskENTER_CRITICAL();
+    retVal = enc28j60_init(ucMACAddress, hspi1 );
+	taskEXIT_CRITICAL();
+
+
+    if (retVal == 0) {
         return pdPASS;
     } else {
         return pdFAIL;
@@ -22,8 +28,9 @@ BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescrip
                                     BaseType_t xReleaseAfterSend )
 {
 	taskENTER_CRITICAL();
-
     enc28j60_send_packet(pxDescriptor->pucEthernetBuffer, pxDescriptor->xDataLength );
+	taskEXIT_CRITICAL();
+
 
     //threadSafePrintf("FreeRTOS: Packet forwarded to driver for transmiting...\n");
     /* Call the standard trace macro to log the send event. */
@@ -34,7 +41,6 @@ BaseType_t xNetworkInterfaceOutput( xNetworkBufferDescriptor_t * const pxDescrip
         vReleaseNetworkBufferAndDescriptor( pxDescriptor );
     }
 
-	taskEXIT_CRITICAL();
 
 
     return pdTRUE;
