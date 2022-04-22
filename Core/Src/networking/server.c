@@ -87,6 +87,7 @@ void periodicWSDataSend(void){
 	//Create the message to tx
 	char txString[256];
 	int strlen;
+	uint8_t dataSent = 0;
 
 	strlen = threadSafeSPrintf(txString, "{\"msgType\":\"newData\",\"time\":%f,\"accelX\":%f,\"accelY\":%f,\"accelZ\":%f,\"gyroX\":%f,\"gyroY\":%f,\"gyroZ\":%f,\"yaw\":%f,\"heapFree\":%d}",
 			fusion_getSampleTime(),
@@ -107,11 +108,12 @@ void periodicWSDataSend(void){
 		if(c->is_websocket && c->is_writable){
 			//For all websockets, send the data
 			mg_ws_send(c, txString, strlen, WEBSOCKET_OP_TEXT);
+			dataSent = 1;
 		}
-
-
 		c = c->next; //move on to next connection
 	}
+
+	statusLED_clientConnected(dataSent);
 
 }
 

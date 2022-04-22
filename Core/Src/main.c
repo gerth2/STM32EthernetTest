@@ -17,18 +17,19 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <statusLED.h>
 #include "main.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "LEDBlinker.h"
 #include "networking.h"
 #include "server.h"
 #include "mpu60x0.h"
 #include "fusion.h"
 #include "settings.h"
 #include "eeprom.h"
+#include "statusLED.h"
 
 /* USER CODE END Includes */
 
@@ -159,6 +160,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   threadSafePrintf("[MAIN] User Init Started...\n");
+  statusLED_init();
   eeprom_initBlocks();
   timeInit();
   RetargetInit(&huart1);
@@ -479,7 +481,7 @@ void StartTask_10ms(void *argument)
 {
   /* USER CODE BEGIN StartTask_10ms */
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.005 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.01 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 
 	threadSafePrintf("[MAIN] Starting 10ms task\n");
@@ -489,7 +491,7 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 		mpu60x0_update();
 		fusion_update();
-
+		statusLED_update();
 		/* 10mS Periodic Code END */
 	}
   /* USER CODE END StartTask_10ms */

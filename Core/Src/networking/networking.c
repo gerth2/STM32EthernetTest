@@ -49,9 +49,11 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
 	if (eNetworkEvent == eNetworkUp) {
 		threadSafePrintf("[HARDWARE] Network UP\n");
 		serverStatus = SERVER_INIT;
+		statusLED_setNetworkUp(1);
 	} else if (eNetworkEvent == eNetworkDown) {
 		threadSafePrintf("[HARDWARE] Network DOWN\n");
 		serverStatus = SERVER_SHUTDOWN;
+		statusLED_setNetworkUp(0);
 	}
 }
 
