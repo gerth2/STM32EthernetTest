@@ -1,4 +1,4 @@
-import os,json,htmlmin,gzip
+import os,json,htmlmin,gzip,re
 from io import BytesIO
 from jsmin import jsmin
 from string import Template
@@ -8,6 +8,19 @@ import zlib
 TMPLT_FILE = "./index_tmplt.c"
 OUT_FILE = "../Core/Src/networking/index.c"
 src_file_list = []
+
+def comment_remover(text):
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return " " # note: a space and not an empty string
+        else:
+            return s
+    pattern = re.compile(
+        r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
+        re.DOTALL | re.MULTILINE
+    )
+    return re.sub(pattern, replacer, text)
 
 class FileContents():
     def __init__(self, source):
@@ -26,9 +39,9 @@ class FileContents():
             if(self.mimeType=="html"):
                 minContents = htmlmin.minify(fileContents, remove_comments=True, remove_empty_space=True)
             elif(self.mimeType=="css"):
-                minContents = fileContents.replace("\n\n", "\n").replace("    ", "").replace("  ", "")
+                minContents = comment_remover(fileContents).replace("\n", "").replace("    ", "").replace("  ", "").replace("\t", "")
             elif(self.mimeType=="js"):
-                minContents = jsmin(fileContents)
+                minContents = jsmin(comment_remover(fileContents))
             else:
                 minContents = fileContents
 
@@ -60,12 +73,19 @@ class FileContents():
 
 if __name__ == "__main__":
 
+    totalSize = 0;
+
     # Find all files to include
     for file in os.listdir("."):
         if file.endswith(".html") or file.endswith(".js") or file.endswith(".css"):
             print("\n==========")
             print("Adding {}".format(file))
-            src_file_list.append(FileContents(file))
+            newWebSrcFile = FileContents(file)
+            src_file_list.append(newWebSrcFile)
+            totalSize += len(newWebSrcFile.gzipBytes)
+
+    print("\n============================")
+    print("==> Total Web Content Size: {} bytes".format(totalSize))
 
     with open(OUT_FILE, "w") as outfile:
         pageData = ""

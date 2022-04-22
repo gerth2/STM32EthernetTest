@@ -3,24 +3,25 @@
 
 <head>
     <link rel="stylesheet" href="main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-    <h1>Network IMU</h1>
+    <h1 id="deviceTitleText">Network IMU</h1>
     <hr>
 
     <div class="tab">
         <button class="tablinks" onclick="selectTab(event, 'Status')" id="defaultOpen">Status</button>
         <button class="tablinks" onclick="selectTab(event, 'Graphs')">Graphs</button>
         <button class="tablinks" onclick="selectTab(event, 'Settings')">Settings</button>
-      </div>
-      
-      <div id="Status" class="tabcontent">
-        <table >
+    </div>
+
+    <div id="Status" class="tabcontent">
+        <table>
             <tr>
-                <th style="width:100px" > Data</th>
-                <th style="width:200px" > Value</th>
-                <th style="width:75px"  > Units</th>
+                <th style="width:100px"> Data</th>
+                <th style="width:200px"> Value</th>
+                <th style="width:75px"> Units</th>
             </tr>
             <tr>
                 <td>Time</td>
@@ -69,22 +70,18 @@
             </tr>
         </table>
         <hr>
-      </div>
-      
-      <!-------------------------------------------------------------------------------------->
-      <div id="Graphs" class="tabcontent">
-        <h3>Graphs still TODO</h3>
-      </div>
-      
-      <!-------------------------------------------------------------------------------------->
-      <div id="Settings" class="tabcontent">
-        <table> 
+    </div>
+
+    <!-------------------------------------------------------------------------------------->
+    <div id="Settings" class="tabcontent">
+        <table>
             <tr>
                 <td>
                     <label for="name">Device Name</label>
                 </td>
                 <td>
-                    <input type="text" id="deviceName" name="deviceName" required minlength="1" maxlength="15" size="10">
+                    <input type="text" id="deviceName" name="deviceName" required minlength="1" maxlength="15"
+                        size="10">
                 </td>
             </tr>
             <tr>
@@ -100,7 +97,7 @@
                     <label for="name">Device Subnet Mask</label>
                 </td>
                 <td>
-                    <input type="text" id="ucNetMask" name="ucNetMask" minlength="7" maxlength="15" size="15">                                                
+                    <input type="text" id="ucNetMask" name="ucNetMask" minlength="7" maxlength="15" size="15">
                 </td>
             </tr>
             <tr>
@@ -108,7 +105,8 @@
                     <label for="name">Device Gateway IP</label>
                 </td>
                 <td>
-                    <input type="text" id="ucGatewayAddress" name="ucGatewayAddress" minlength="7" maxlength="15" size="15">                                                
+                    <input type="text" id="ucGatewayAddress" name="ucGatewayAddress" minlength="7" maxlength="15"
+                        size="15">
                 </td>
             </tr>
             <tr>
@@ -116,7 +114,8 @@
                     <label for="name">NT4 Server IP</label>
                 </td>
                 <td>
-                    <input type="text" id="nt4ServerAddress" name="nt4ServerAddress" minlength="7" maxlength="15" size="15"> 
+                    <input type="text" id="nt4ServerAddress" name="nt4ServerAddress" minlength="7" maxlength="15"
+                        size="15">
                 </td>
             </tr>
         </table>
@@ -126,17 +125,29 @@
         <table>
             <tr>
                 <td>
-                    <button onclick="onSettingsReset()">Reset</button> 
+                    <button onclick="onSettingsReset()">Reset</button>
                 </td>
                 <td>
-                    <button onclick="onSettingsSubmit()">Submit</button> 
+                    <button onclick="onSettingsSubmit()">Submit</button>
                 </td>
             </tr>
         </table>
-    
-      </div>
 
-    
+    </div>
+
+
+    <!-- Modal for notifications -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>
+                <div id="modalText"></div>
+            </p>
+        </div>
+
+    </div>
 
 
     <script src="main.js"></script>

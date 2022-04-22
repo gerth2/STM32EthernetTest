@@ -479,7 +479,7 @@ void StartTask_10ms(void *argument)
 {
   /* USER CODE BEGIN StartTask_10ms */
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = (TickType_t) round(0.010 * ((double) configTICK_RATE_HZ));
+	const TickType_t xFrequency = (TickType_t) round(0.005 * ((double) configTICK_RATE_HZ));
 	xLastWakeTime = xTaskGetTickCount();
 
 	threadSafePrintf("[MAIN] Starting 10ms task\n");
