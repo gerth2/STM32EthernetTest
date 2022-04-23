@@ -15,15 +15,25 @@ function wsOnOpenHandler(event) {
 function wsOnMessageHandler(event) {
 	rxData = JSON.parse(event.data);
 	if (rxData.msgType == "newData") {
-		document.getElementById("time").innerHTML = rxData.time;
-		document.getElementById("xaccel").innerHTML = rxData.accelX;
-		document.getElementById("yaccel").innerHTML = rxData.accelY;
-		document.getElementById("zaccel").innerHTML = rxData.accelZ;
-		document.getElementById("xgyro").innerHTML = rxData.gyroX;
-		document.getElementById("ygyro").innerHTML = rxData.gyroY;
-		document.getElementById("zgyro").innerHTML = rxData.gyroZ;
-		document.getElementById("yaw").innerHTML = rxData.yaw;
-		document.getElementById("heapFree").innerHTML = rxData.heapFree;
+        var dataTable = document.getElementById("dataTable");
+        for(key in rxData){
+            value = rxData[key];
+
+            //get row
+            var row = document.getElementById(key);
+
+            //Add row if it does not exist
+            if(!row){
+                row = dataTable.insertRow(-1);
+                row.id = key;
+                row.insertCell(0);
+                row.insertCell(1);
+            }
+
+            row.cells[0].innerHTML = key;
+            row.cells[1].innerHTML = rxData[key];
+
+        }
 	} else if (rxData.msgType == "curSettings") {
 
 	} else {
