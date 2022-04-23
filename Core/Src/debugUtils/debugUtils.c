@@ -35,7 +35,7 @@ int my_vfprintf(char *buf, char const *fmt, va_list arg) {
 
     char ch;
 
-    char buffer[128];
+    char buffer[256];
 
     while ( ch = *fmt++) {
         if ( '%' == ch ) {

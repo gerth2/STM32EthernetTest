@@ -85,11 +85,11 @@ void periodicWSDataSend(void){
 	struct mg_connection *c = mgr.conns;
 
 	//Create the message to tx
-	char txString[256];
+	char txString[512];
 	int strlen;
 	uint8_t dataSent = 0;
 
-	strlen = threadSafeSPrintf(txString, "{\"msgType\":\"newData\",\"time\":%f,\"accelX\":%f,\"accelY\":%f,\"accelZ\":%f,\"gyroX\":%f,\"gyroY\":%f,\"gyroZ\":%f,\"yaw\":%f,\"heapFree\":%d}",
+	strlen = threadSafeSPrintf(txString, "{\"msgType\":\"newData\",\"time\":%f,\"accelX\":%f,\"accelY\":%f,\"accelZ\":%f,\"gyroX\":%f,\"gyroY\":%f,\"gyroZ\":%f,\"roll\":%f,\"pitch\":%f,\"yaw\":%f,\"rollFusion\":%d,\"pitchFusion\":%d,\"yawFusion\":%d,\"heapFree\":%d}",
 			fusion_getSampleTime(),
 			fusion_getXAccel(),
 			fusion_getYAccel(),
@@ -97,7 +97,12 @@ void periodicWSDataSend(void){
 			fusion_getXGyro(),
 			fusion_getYGyro(),
 			fusion_getZGyro(),
+			fusion_getRoll(),
+			fusion_getPitch(),
 			fusion_getYaw(),
+			fusion_getRollFusionActive(),
+			fusion_getPitchFusionActive(),
+			fusion_getYawFusionActive(),
 			perfmon_getFreeHeap()
 			);
 

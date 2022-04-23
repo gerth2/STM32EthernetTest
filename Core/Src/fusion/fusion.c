@@ -13,6 +13,9 @@ float calAdjAccelZ = 0;
 float yaw = 0;
 float roll = 0;
 float pitch = 0;
+bool yawFusionActive = false;
+bool rollFusionActive = false;
+bool pitchFusionActive = false;
 
 //Complimentary filter calibrations
 float compFilt_accel_trust_factor = 0.02;
@@ -70,19 +73,22 @@ void fusion_update(){
 
 		//Pitch Complementary Filter
 		double accelForPitch = sqrt(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
-		if(accelForPitch > compFilt_min_accel && accelForPitch < compFilt_max_accel){
+		pitchFusionActive = (accelForPitch > compFilt_min_accel && accelForPitch < compFilt_max_accel);
+		if(pitchFusionActive){
 			pitch = pitch * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelY, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
 		}
 
 		//Roll Complementary Filter
 		double accelForRoll = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelZ*calAdjAccelZ);
-		if(accelForRoll > compFilt_min_accel && accelForRoll < compFilt_max_accel){
+		rollFusionActive = (accelForRoll > compFilt_min_accel && accelForRoll < compFilt_max_accel);
+		if(rollFusionActive){
 			roll = roll * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
 		}
 
 		//Yaw Complementary Filter
 		double accelForYaw = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelY*calAdjAccelY);
-		if(accelForYaw > compFilt_min_accel && accelForYaw < compFilt_max_accel){
+		yawFusionActive = (accelForYaw > compFilt_min_accel && accelForYaw < compFilt_max_accel);
+		if(yawFusionActive){
 			yaw = yaw * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelY)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
 		}
 
@@ -135,3 +141,12 @@ float fusion_getYaw(void){
 	return yaw;
 }
 
+bool fusion_getYawFusionActive(void){
+	return yawFusionActive;
+}
+bool fusion_getPitchFusionActive(void){
+	return pitchFusionActive;
+}
+bool fusion_getRollFusionActive(void){
+	return rollFusionActive;
+}
