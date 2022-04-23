@@ -6,12 +6,14 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
 #include "main.h"
 #include "debugUtils.h"
+#include "shutdown.h"
 
 void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNetworkBuffer );
 xNetworkBufferDescriptor_t *pxGetNetworkBufferWithDescriptor( size_t xRequestedSizeBytes, TickType_t xBlockTimeTicks );

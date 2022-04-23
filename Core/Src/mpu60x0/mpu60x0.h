@@ -1,12 +1,14 @@
 #ifndef MPU60x0_H_
 #define MPU60x0_H_
 
-#include "stm32f4xx_hal.h"
 #include <stdio.h>
+
+#include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timeManager.h"
 #include "debugUtils.h"
+#include "shutdown.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

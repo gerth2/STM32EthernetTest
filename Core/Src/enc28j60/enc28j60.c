@@ -395,26 +395,22 @@ static uint8_t enc28j60_txrx_byte(uint8_t data) {
 	case HAL_BUSY:
 		debug("PANIC: SPI: busy state occured at %s, line %d .\n", __FILE__,
 				__LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	case HAL_TIMEOUT:
 		debug("PANIC: SPI: transmit/receive timeout occured at %s, line %d .\n",
 				__FILE__, __LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	case HAL_ERROR:
 		debug("PANIC: SPI: transmit/receive error at %s, line %d.\n", __FILE__,
 				__LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	default:
 		debug("PANIC: SPI: transmit/receive WUT HAPPEND at %s, line %d.\n",
 				__FILE__, __LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	}
 	taskEXIT_CRITICAL();

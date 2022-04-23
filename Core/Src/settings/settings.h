@@ -3,10 +3,13 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #include <ctype.h>
+
 #include "debugUtils.h"
 #include "mjson.h"
 #include "eeprom.h"
+#include "shutdown.h"
 
 typedef struct UserSettings {
   char deviceName[32];

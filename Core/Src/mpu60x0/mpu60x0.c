@@ -148,26 +148,22 @@ static void checkStatus(HAL_StatusTypeDef status) {
 	case HAL_BUSY:
 		threadSafePrintf("[IMU] PANIC: I2C: busy state occured at %s, line %d .\n", __FILE__,
 				__LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	case HAL_TIMEOUT:
 		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive timeout occured at %s, line %d .\n",
 				__FILE__, __LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	case HAL_ERROR:
 		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive error at %s, line %d.\n", __FILE__,
 				__LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	default:
 		threadSafePrintf("[IMU] PANIC: I2C: transmit/receive WUT HAPPEND at %s, line %d.\n",
 				__FILE__, __LINE__);
-		while (1)
-			;
+		shutdown_restartUnExpected();
 		break;
 	}
 }

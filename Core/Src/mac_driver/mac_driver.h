@@ -7,16 +7,18 @@
 #define BUF_SIZE MAX(NET_BUF_SIZE, UART_BUF_SIZE)
 
 #include <stdint.h>
+#include <string.h>
+
 #include "main.h"
 #include "FreeRTOS.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
 #include "NetworkBufferManagement.h"
 #include "server.h"
-#include <string.h>
 #include "settings.h"
 #include "debugUtils.h"
 #include "enc28j60.h"
+#include "statusLED.h"
 
 void MAC_Init();
 

@@ -72,42 +72,52 @@ void parseIPString(uint8_t * dst, char * str){
 void settings_parseSettingsFromJson(char * buf, int len){
 	char tmpStr[35];
 	int resStrLen;
+	bool settingsUpdated = false;
 
 	resStrLen = mjson_get_string(buf, len, "$.deviceName", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new deviceName %s\n", tmpStr);
 		strcpy(curSettings.deviceName, tmpStr);
+		settingsUpdated = true;
 	}
 
 	resStrLen = mjson_get_string(buf, len, "$.ucIPAddress", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new ucIPAddress %s\n", tmpStr);
 		parseIPString(curSettings.ucIPAddress, tmpStr);
+		settingsUpdated = true;
 	}
 
 	resStrLen = mjson_get_string(buf, len, "$.ucNetMask", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new ucNetMask %s\n", tmpStr);
 		parseIPString(curSettings.ucNetMask, tmpStr);
+		settingsUpdated = true;
 	}
 
 	resStrLen = mjson_get_string(buf, len, "$.ucGatewayAddress", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new ucGatewayAddress %s\n", tmpStr);
 		parseIPString(curSettings.ucGatewayAddress, tmpStr);
+		settingsUpdated = true;
 	}
 
 	resStrLen = mjson_get_string(buf, len, "$.ucDNSServerAddress", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new ucDNSServerAddress %s\n", tmpStr);
 		parseIPString(curSettings.ucDNSServerAddress, tmpStr);
+		settingsUpdated = true;
 	}
 
 	resStrLen = mjson_get_string(buf, len, "$.nt4ServerAddress", tmpStr, 35);
 	if(resStrLen > 0){
 		threadSafePrintf("[SETTINGS] Got new nt4ServerAddress %s\n", tmpStr);
 		parseIPString(curSettings.nt4ServerAddress, tmpStr);
+		settingsUpdated = true;
 	}
 
-	settings_save();
+	if(settingsUpdated){
+		settings_save();
+		//shutdown_restartExpected(); todo, this has to be triggered like 3 seconds after this?
+	}
 }

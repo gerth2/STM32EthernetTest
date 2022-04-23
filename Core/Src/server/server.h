@@ -15,8 +15,8 @@
 #include "mpu60x0.h"
 #include "fusion.h"
 #include "perfMon.h"
-
-#include "../mac_driver/mac_driver.h"
+#include "statusLED.h"
+#include "mac_driver.h"
 
 /** Public API */
 void serverInit(void);
