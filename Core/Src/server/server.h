@@ -9,13 +9,14 @@
 
 #include "mongoose.h"
 #include "mjson.h"
-#include "networking.h"
 #include "mdns.h"
 #include "timeManager.h"
 #include "stm32f4xx_hal.h"
 #include "mpu60x0.h"
 #include "fusion.h"
 #include "perfMon.h"
+
+#include "../mac_driver/mac_driver.h"
 
 /** Public API */
 void serverInit(void);

@@ -1,4 +1,4 @@
-#include "networking.h"
+#include "mac_driver.h"
 
 
 //////////////////////////////////
@@ -103,15 +103,10 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 //////////////////////////////////
 // RTOS Tasking Interface
 
-void NetworkingInit() {
+void MAC_Init() {
 	/* Initialise the TCP/IP stack. */
 	threadSafePrintf("[HARDWARE] Starting FreeRTOS TCP-IP Stack\n");
 	FreeRTOS_IPInit(curSettings.ucIPAddress, curSettings.ucNetMask, curSettings.ucGatewayAddress,
 			curSettings.ucDNSServerAddress, ucMACAddress);
 	threadSafePrintf("[HARDWARE] FreeRTOS TCP-IP Stack Init Complete\n");
 }
-
-void NetworkingPeriodic() {
-
-}
-

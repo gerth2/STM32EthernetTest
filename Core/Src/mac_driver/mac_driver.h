@@ -18,8 +18,7 @@
 #include "debugUtils.h"
 #include "enc28j60.h"
 
-void NetworkingInit();
-void NetworkingPeriodic(void);
+void MAC_Init();
 
 #define SERVER_NOCHANGE 0
 #define SERVER_INIT 1

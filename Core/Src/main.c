@@ -23,13 +23,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "networking.h"
 #include "server.h"
 #include "mpu60x0.h"
 #include "fusion.h"
 #include "settings.h"
 #include "eeprom.h"
 #include "statusLED.h"
+
+#include "mac_driver/mac_driver.h"
 
 /* USER CODE END Includes */
 
@@ -158,16 +159,15 @@ int main(void)
   MX_TIM11_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-
+  RetargetInit(&huart1);
   threadSafePrintf("[MAIN] User Init Started...\n");
   statusLED_init();
   eeprom_initBlocks();
   timeInit();
-  RetargetInit(&huart1);
+  mpu60x0_init(hi2c1);
   fusion_reset();
   settings_init();
-  NetworkingInit();
-  mpu60x0_init(hi2c1);
+  MAC_Init();
   threadSafePrintf("[MAIN] User Init Completed!\n");
 
 
