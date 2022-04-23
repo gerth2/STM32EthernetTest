@@ -29,8 +29,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (xTimerPendFunctionCallFromISR(prvReceivePacket,
 	NULL, 0, &xHigherPriorityTaskWoken) == pdFALSE) {
 		debug("PANIC: enc28j60: daemon's queue full\n");
-		while (1)
-			;
+		shutdown_restartUnExpected();
 	}
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -161,7 +160,14 @@ void prvReceivePacket(void *buf, uint32_t pktlen) {
 
 	volatile uint8_t eir_flags = enc28j60_rcr(EIR);
 
-	if (eir_flags & EIR_PKTIF) { /* if there is pending packet */
+	// See https://www.digikey.com/htmldatasheets/production/49289/0/0/1/enc28j60-revision-b7-errata.html
+	// PKTIF is not always reliable
+	volatile uint8_t packetsAvailableEratta8Workaround = enc28j60_rcr(EPKTCNT);
+	if(eir_flags == 0x0 && packetsAvailableEratta8Workaround){
+		threadSafePrintf("[ENC28J60] Zero EIR Flags but packet available - Errata 8 detected\n");
+	}
+
+	if (eir_flags & EIR_PKTIF || packetsAvailableEratta8Workaround) { /* if there is pending packet */
 		// retrieve packet from enc28j60
 		uint16_t xBytesReceived = 0, rxlen, status, temp;
 		xNetworkBufferDescriptor_t *pxBufferDescriptor;
