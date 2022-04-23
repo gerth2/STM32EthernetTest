@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "eeprom.h"
 #include "statusLED.h"
+#include "shutdown.h"
 
 #include "mac_driver/mac_driver.h"
 
@@ -463,7 +464,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(300);
+		osDelay(10);
 		mdns_update(); //currently this function blocks like foreverz so...it's here.
 		//perfmon_printHeapStats();
 	}
@@ -491,7 +492,7 @@ void StartTask_10ms(void *argument)
 		/* 10mS Periodic Code START */
 		mpu60x0_update();
 		fusion_update();
-		statusLED_update();
+		statusLED_periodic();
 		/* 10mS Periodic Code END */
 	}
   /* USER CODE END StartTask_10ms */
@@ -553,12 +554,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
-	__disable_irq();
-    NVIC_SystemReset();
-    while (1)
-    {
-
-    }
+	shutdown_restartUnExpected();
   /* USER CODE END Error_Handler_Debug */
 }
 

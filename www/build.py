@@ -2,11 +2,9 @@ import os,json,htmlmin,gzip,re
 from io import BytesIO
 from jsmin import jsmin
 from string import Template
-from cachetools import RRCache
-import zlib
 
 TMPLT_FILE = "./index_tmplt.c"
-OUT_FILE = "../Core/Src/networking/index.c"
+OUT_FILE = "../Core/Src/server/index.c"
 src_file_list = []
 
 def comment_remover(text):

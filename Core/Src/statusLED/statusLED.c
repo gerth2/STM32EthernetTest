@@ -47,7 +47,7 @@ void statusLED_clientConnected(uint8_t in){
 ///////////////////////////////////////////////
 
 
-void statusLED_update(){
+void statusLED_periodic(){
 
 	if(callCounter++ >= PERIODIC_CALL_DECIMATION){
 		callCounter = 0;
