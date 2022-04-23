@@ -463,7 +463,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		osDelay(100);
+		osDelay(300);
 		mdns_update(); //currently this function blocks like foreverz so...it's here.
 		//perfmon_printHeapStats();
 	}

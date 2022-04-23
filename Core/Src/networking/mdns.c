@@ -426,9 +426,9 @@ void advertise()
       RESPONSE_DOMAIN_LOCAL,
       0,
       0,
-      MDNS_PORT,
+	  FreeRTOS_htons(MDNS_PORT),
       (uint8_t*)dip,
-      MDNS_PORT
+	  FreeRTOS_htons(MDNS_PORT)
     );
 }
 
@@ -720,8 +720,10 @@ void sendResponse(
 	struct freertos_sockaddr xDestinationAddress;
 	int32_t iReturned;
 
+	xDestinationAddress.sin_family = FREERTOS_AF_INET;
     xDestinationAddress.sin_addr = FreeRTOS_inet_addr_quick( src_ip[0], src_ip[1], src_ip[2], src_ip[3] );
     xDestinationAddress.sin_port = ( src_port ); //conversion to byte order already done.
+    xDestinationAddress.sin_len = sizeof(xDestinationAddress);
 
     /* Send the buffer with ulFlags set to 0, so the FREERTOS_ZERO_COPY bit
     is clear. */
@@ -777,10 +779,8 @@ void mdns_update(){
 		return;
 	}
 
-	advertise_counter++;
-	if(advertise_counter > 200 && total_advertisements < 8){
+	if(total_advertisements < 8){
 		advertise();
-		advertise_counter = 0;
 		total_advertisements++;
 	}
 
@@ -825,7 +825,7 @@ void mdns_update(){
 
 	        onUdpReceive(
 	        	dip,
-	        	MDNS_PORT,
+				FreeRTOS_htons(MDNS_PORT),
 				&xSourceAddress.sin_addr,
 				xSourceAddress.sin_port,
 				ucBuffer,
