@@ -9,6 +9,8 @@ float calAdjAccelX = 0;
 float calAdjAccelY = 0;
 float calAdjAccelZ = 0;
 
+quaternion_t curOrientation;
+
 //Fused pose estimates
 float yaw = 0;
 float roll = 0;
@@ -16,6 +18,8 @@ float pitch = 0;
 bool yawFusionActive = false;
 bool rollFusionActive = false;
 bool pitchFusionActive = false;
+
+bool accelFusionActive = false;
 
 //Complimentary filter calibrations
 float compFilt_accel_trust_factor = 0.02;
@@ -30,6 +34,11 @@ void fusion_reset(){
 	yaw = 0;
 	prevSampleTime = -1;
 	calInit();
+
+	curOrientation.w = 0;
+	curOrientation.x = 0;
+	curOrientation.y = 0;
+	curOrientation.z = 1.0;
 }
 
 float wrapAngle (float in){
@@ -56,41 +65,40 @@ void fusion_update(){
 	calAdjAccelY = cal_applyAccelY(mpu60x0_getYAccel());
 	calAdjAccelZ = cal_applyAccelZ(mpu60x0_getZAccel());
 
+
 	//Complementary Filters
 	if(prevSampleTime > 0){
 		//Loop Time
 		float deltaTime = (sampleTime - prevSampleTime);
 
 		//Accumulate gyro
-		pitch += calAdjGyroX * deltaTime;
-		roll += calAdjGyroY * deltaTime;
-		yaw += calAdjGyroZ * deltaTime;
+		quaternion_t gyroQuat;
+		quat_fromGyro(&gyroQuat, calAdjGyroX, calAdjGyroY, calAdjGyroZ, deltaTime);
+		quat_mult(&curOrientation, &curOrientation, &gyroQuat);
 
-		//Wrap Angles
-		pitch = wrapAngle(pitch);
-		roll = wrapAngle(roll);
-		yaw = wrapAngle(yaw);
+		double accelMag =  sqrt(calAdjAccelX*calAdjAccelX  + calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
+		accelFusionActive = (accelMag > compFilt_min_accel && accelMag < compFilt_max_accel);
+		if(accelFusionActive){
+			quaternion_t gyroCompTemp;
+			quaternion_t accelCompTemp;
 
-		//Pitch Complementary Filter
-		double accelForPitch = sqrt(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
-		pitchFusionActive = (accelForPitch > compFilt_min_accel && accelForPitch < compFilt_max_accel);
-		if(pitchFusionActive){
-			pitch = pitch * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelY, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
+			accelCompTemp.w = 0.0;
+			accelCompTemp.x = calAdjAccelX;
+			accelCompTemp.y = calAdjAccelY;
+			accelCompTemp.z = calAdjAccelZ;
+
+			quat_norm(&accelCompTemp, &accelCompTemp);
+			quat_scale(&accelCompTemp, &accelCompTemp, compFilt_accel_trust_factor);
+
+			quat_copy(&gyroCompTemp, &curOrientation);
+			quat_scale(&gyroCompTemp, &gyroCompTemp, (1.0 - compFilt_accel_trust_factor));
+
+			quat_mult(&curOrientation, &gyroCompTemp, &accelCompTemp);
 		}
 
-		//Roll Complementary Filter
-		double accelForRoll = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelZ*calAdjAccelZ);
-		rollFusionActive = (accelForRoll > compFilt_min_accel && accelForRoll < compFilt_max_accel);
-		if(rollFusionActive){
-			roll = roll * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
-		}
-
-		//Yaw Complementary Filter
-		double accelForYaw = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelY*calAdjAccelY);
-		yawFusionActive = (accelForYaw > compFilt_min_accel && accelForYaw < compFilt_max_accel);
-		if(yawFusionActive){
-			yaw = yaw * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelY)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
-		}
+		pitch = quat_getPitch(curOrientation) * 180/M_PI;
+		roll = quat_getRoll(curOrientation) * 180/M_PI;
+		yaw = quat_getYaw(curOrientation) * 180/M_PI;
 
 
 	} else {
