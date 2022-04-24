@@ -12,8 +12,8 @@ void reboot(void){
  * hardware
  */
 void shutdown_restartExpected(){
-	threadSafePrintf("[SHUTDOWN] Performing expected reboot...");
-
+	threadSafePrintf("[SHUTDOWN] Performing expected reboot...\n");
+	reboot();
 }
 
 /**
@@ -21,6 +21,6 @@ void shutdown_restartExpected(){
  * For example, stack overflow
  */
 void shutdown_restartUnExpected(){
-	threadSafePrintf("[SHUTDOWN] Performing unexpected reboot...");
-
+	threadSafePrintf("[SHUTDOWN] Performing unexpected reboot...\n");
+	reboot();
 }
