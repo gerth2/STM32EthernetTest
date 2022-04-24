@@ -27,6 +27,7 @@ float cal_applyGyroZ(float raw);
 float cal_applyAccelX(float raw);
 float cal_applyAccelY(float raw);
 float cal_applyAccelZ(float raw);
+unsigned char getCalState();
 
 
 #endif

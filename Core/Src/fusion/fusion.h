@@ -8,6 +8,7 @@
 #include "mpu60x0.h"
 #include "timeManager.h"
 #include "runningCal.h"
+#include "rotation2d.h"
 
 void fusion_reset();
 

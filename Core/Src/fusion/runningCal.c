@@ -29,9 +29,9 @@ void calUpdate(float gyroX_raw, float gyroY_raw, float gyroZ_raw, float accelX_r
 		circBuffer_add(&gyroXCalBuffer, gyroX_raw);
 		circBuffer_add(&gyroYCalBuffer, gyroY_raw);
 		circBuffer_add(&gyroZCalBuffer, gyroZ_raw);
-		float accelNormalize = 1.0 / (float) sqrt(accelX_raw*accelX_raw +
-												accelY_raw*accelY_raw +
-												accelZ_raw*accelZ_raw);
+		float accelNormalize = 1.0 / sqrtf(accelX_raw*accelX_raw +
+										accelY_raw*accelY_raw +
+										accelZ_raw*accelZ_raw);
 		circBuffer_add(&accelNormCalBuffer, accelNormalize);
 
 		calState = CAL_STATE_ACTIVE;
@@ -42,10 +42,15 @@ void calUpdate(float gyroX_raw, float gyroY_raw, float gyroZ_raw, float accelX_r
 		float accelY = cal_applyAccelX(accelY_raw);
 		float accelZ = cal_applyAccelX(accelZ_raw);
 
+		float gyroX = cal_applyGyroX(gyroX_raw);
+		float gyroY = cal_applyGyroY(gyroY_raw);
+		float gyroZ = cal_applyGyroY(gyroZ_raw);
+
 		//Basic algorithm - if only gravity is impacting us, for a one-sided debounce,
 		// we can assume the unit is still and able to be calibrated.
-		float accelMag = (float) sqrt(accelX*accelX + accelY*accelY + accelZ*accelZ);
-		if(accelMag > 0.9 && accelMag < 1.1){
+		float accelMag = sqrtf(accelX*accelX + accelY*accelY + accelZ*accelZ);
+		float gyroMag = sqrtf(gyroX*gyroX + gyroY*gyroY + gyroZ*gyroZ);
+		if(accelMag > 0.97 && accelMag < 1.03 && gyroMag < 10.0){
 			if(calDbnc > 0){
 				calDbnc--;
 			}
@@ -91,4 +96,8 @@ float cal_applyAccelY(float raw){
 
 float cal_applyAccelZ(float raw){
 	return (raw ) * circBuffer_getAvg(&accelNormCalBuffer);
+}
+
+unsigned char getCalState(){
+	return calState;
 }

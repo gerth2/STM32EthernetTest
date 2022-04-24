@@ -2,17 +2,17 @@
 #include "fusion.h"
 
 // Calibration-corrected imu values
-float calAdjGyroX = 0;
-float calAdjGyroY = 0;
-float calAdjGyroZ = 0;
+rotation2d_t calAdjGyroX;
+rotation2d_t calAdjGyroY;
+rotation2d_t calAdjGyroZ;
 float calAdjAccelX = 0;
 float calAdjAccelY = 0;
 float calAdjAccelZ = 0;
 
 //Fused pose estimates
-float yaw = 0;
-float roll = 0;
-float pitch = 0;
+rotation2d_t yaw;
+rotation2d_t roll;
+rotation2d_t pitch;
 bool yawFusionActive = false;
 bool rollFusionActive = false;
 bool pitchFusionActive = false;
@@ -27,7 +27,9 @@ float prevSampleTime = -1;
 
 
 void fusion_reset(){
-	yaw = 0;
+	rot2d_fromDegrees(&yaw, 0.0);
+	rot2d_fromDegrees(&roll, 0.0);
+	rot2d_fromDegrees(&pitch, 0.0);
 	prevSampleTime = -1;
 	calInit();
 }
@@ -49,9 +51,9 @@ void fusion_update(){
 	calUpdate(mpu60x0_getXGyro(), mpu60x0_getYGyro(), mpu60x0_getZGyro(), mpu60x0_getXAccel(), mpu60x0_getYAccel(), mpu60x0_getZAccel());
 
 	//Apply sensor calibration to readings
-	calAdjGyroX = cal_applyGyroX(mpu60x0_getXGyro());
-	calAdjGyroY = cal_applyGyroY(mpu60x0_getYGyro());
-	calAdjGyroZ = cal_applyGyroZ(mpu60x0_getZGyro());
+	rot2d_fromDegrees(&calAdjGyroX, cal_applyGyroX(mpu60x0_getXGyro()));
+	rot2d_fromDegrees(&calAdjGyroY, cal_applyGyroY(mpu60x0_getYGyro()));
+	rot2d_fromDegrees(&calAdjGyroZ, cal_applyGyroZ(mpu60x0_getZGyro()));
 	calAdjAccelX = cal_applyAccelX(mpu60x0_getXAccel());
 	calAdjAccelY = cal_applyAccelY(mpu60x0_getYAccel());
 	calAdjAccelZ = cal_applyAccelZ(mpu60x0_getZAccel());
@@ -62,34 +64,40 @@ void fusion_update(){
 		float deltaTime = (sampleTime - prevSampleTime);
 
 		//Accumulate gyro
-		pitch += calAdjGyroX * deltaTime;
-		roll += calAdjGyroY * deltaTime;
-		yaw += calAdjGyroZ * deltaTime;
-
-		//Wrap Angles
-		pitch = wrapAngle(pitch);
-		roll = wrapAngle(roll);
-		yaw = wrapAngle(yaw);
+		rot2d_integrate(&pitch, &calAdjGyroX, deltaTime);
+		rot2d_integrate(&roll, &calAdjGyroY, deltaTime);
+		rot2d_integrate(&yaw, &calAdjGyroZ, deltaTime);
 
 		//Pitch Complementary Filter
-		double accelForPitch = sqrt(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
+		float accelForPitch = sqrtf(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
 		pitchFusionActive = (accelForPitch > compFilt_min_accel && accelForPitch < compFilt_max_accel);
 		if(pitchFusionActive){
-			pitch = pitch * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelY, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
+			rotation2d_t accelRot;
+			rot2d_fromComponents(&accelRot, calAdjAccelZ, calAdjAccelY);
+			rot2d_scale(&accelRot, compFilt_accel_trust_factor);
+			rot2d_scale(&pitch, (1.0 - compFilt_accel_trust_factor));
+			rot2d_rotateBy(&pitch, &accelRot);
 		}
 
 		//Roll Complementary Filter
-		double accelForRoll = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelZ*calAdjAccelZ);
+		float accelForRoll = sqrtf(calAdjAccelX*calAdjAccelX + calAdjAccelZ*calAdjAccelZ);
 		rollFusionActive = (accelForRoll > compFilt_min_accel && accelForRoll < compFilt_max_accel);
 		if(rollFusionActive){
-			roll = roll * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelZ)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
-		}
+			rotation2d_t accelRot;
+			rot2d_fromComponents(&accelRot, calAdjAccelZ, calAdjAccelX);
+			rot2d_scale(&accelRot, -1.0 * compFilt_accel_trust_factor);
+			rot2d_scale(&roll, (1.0 - compFilt_accel_trust_factor));
+			rot2d_rotateBy(&roll, &accelRot);		}
 
 		//Yaw Complementary Filter
-		double accelForYaw = sqrt(calAdjAccelX*calAdjAccelX + calAdjAccelY*calAdjAccelY);
+		float accelForYaw = sqrtf(calAdjAccelX*calAdjAccelX + calAdjAccelY*calAdjAccelY);
 		yawFusionActive = (accelForYaw > compFilt_min_accel && accelForYaw < compFilt_max_accel);
 		if(yawFusionActive){
-			yaw = yaw * (1.0 - compFilt_accel_trust_factor) + (atan2(calAdjAccelX, calAdjAccelY)+M_PI) * 180/M_PI * compFilt_accel_trust_factor;
+			rotation2d_t accelRot;
+			rot2d_fromComponents(&accelRot, calAdjAccelY, calAdjAccelX);
+			rot2d_scale(&accelRot, -1.0 * compFilt_accel_trust_factor);
+			rot2d_scale(&yaw, (1.0 - compFilt_accel_trust_factor));
+			rot2d_rotateBy(&yaw, &accelRot);
 		}
 
 
@@ -114,15 +122,15 @@ float fusion_getZAccel(){
 }
 
 float fusion_getXGyro(){
-	return calAdjGyroX;
+	return rot2d_toDegrees(&calAdjGyroX);
 }
 
 float fusion_getYGyro(){
-	return calAdjGyroY;
+	return rot2d_toDegrees(&calAdjGyroY);
 }
 
 float fusion_getZGyro(){
-	return calAdjGyroZ;
+	return rot2d_toDegrees(&calAdjGyroZ);
 }
 
 float fusion_getSampleTime(){
@@ -130,15 +138,15 @@ float fusion_getSampleTime(){
 }
 
 float fusion_getPitch(void){
-	return pitch;
+	return rot2d_toDegrees(&pitch);
 }
 
 float fusion_getRoll(void){
-	return roll;
+	return rot2d_toDegrees(&roll);
 }
 
 float fusion_getYaw(void){
-	return yaw;
+	return rot2d_toDegrees(&yaw);
 }
 
 bool fusion_getYawFusionActive(void){

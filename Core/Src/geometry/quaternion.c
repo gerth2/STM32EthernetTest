@@ -1,6 +1,6 @@
 
 
-#include "quaternion.h"
+#include "../geometry/quaternion.h"
 
 // https://www.cprogramming.com/tutorial/3d/quaternions.html
 void quat_mult(quaternion_t * result, quaternion_t * Q1, quaternion_t * Q2){
@@ -30,7 +30,7 @@ void quat_scale(quaternion_t * result, quaternion_t * src, float scaleFactor){
 }
 
 void quat_fromGyro(quaternion_t * result, float gyroX, float gyroY, float gyroZ, float deltaT){
-	float norm = sqrt(gyroX*gyroX + gyroY*gyroY + gyroZ*gyroZ);
+	float norm = sqrtf(gyroX*gyroX + gyroY*gyroY + gyroZ*gyroZ);
 
 	result->w = deltaT*norm;
 	result->x = gyroX/norm;
@@ -39,7 +39,7 @@ void quat_fromGyro(quaternion_t * result, float gyroX, float gyroY, float gyroZ,
 }
 
 void quat_norm(quaternion_t * result, quaternion_t * Q1){
-	float norm = sqrt(Q1->w*Q1->w + Q1->x*Q1->x + Q1->y*Q1->y + Q1->z*Q1->z);
+	float norm = sqrtf(Q1->w*Q1->w + Q1->x*Q1->x + Q1->y*Q1->y + Q1->z*Q1->z);
 	result->w = Q1->w/norm;
 	result->x = Q1->x/norm;
 	result->y = Q1->y/norm;
@@ -68,13 +68,13 @@ void quat_copy(quaternion_t * dst, quaternion_t * src){
 
 // https://stackoverflow.com/questions/5782658/extracting-yaw-from-a-quaternion
 float quat_getRoll(quaternion_t src){
-	return atan2(2.0 * (src.z * src.y + src.w * src.x) , 1.0 - 2.0 * (src.x * src.x + src.y * src.y));
+	return atan2f(2.0 * (src.z * src.y + src.w * src.x) , 1.0 - 2.0 * (src.x * src.x + src.y * src.y));
 }
 
 float quat_getPitch(quaternion_t src){
-	return asin(2.0 * (src.y * src.w - src.z * src.x));
+	return asinf(2.0 * (src.y * src.w - src.z * src.x));
 }
 
 float quat_getYaw(quaternion_t src){
-	return atan2(2.0 * (src.z * src.w + src.x * src.y) , - 1.0 + 2.0 * (src.w * src.w + src.x * src.x));
+	return atan2f(2.0 * (src.z * src.w + src.x * src.y) , - 1.0 + 2.0 * (src.w * src.w + src.x * src.x));
 }
