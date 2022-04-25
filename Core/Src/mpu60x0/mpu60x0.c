@@ -51,13 +51,17 @@ void mpu60x0_init(I2C_HandleTypeDef i2cHandle){
 
 		// Set accelerometer configuration in ACCEL_CONFIG Register
 		// XA_ST=0,YA_ST=0,ZA_ST=0, FS_SEL=0 -> 8g
-		Data = 0b00010000;
+		Data = 0b00100000;
 		checkStatus(HAL_I2C_Mem_Write(&imu_i2c, MPU6050_ADDR, ACCEL_CONFIG_REG, 1, &Data, 1, 1000));
 
 		// Set Gyroscopic configuration in GYRO_CONFIG Register
 		// XG_ST=0,YG_ST=0,ZG_ST=0, FS_SEL=0 -> 500 deg/sec
 		Data = 0b00001000;
 		checkStatus(HAL_I2C_Mem_Write(&imu_i2c, MPU6050_ADDR, GYRO_CONFIG_REG, 1, &Data, 1, 1000));
+
+		// filtering configuration - minimal filterning, as we'll do that on the processor
+		Data = 0b00000000;
+		checkStatus(HAL_I2C_Mem_Write(&imu_i2c, MPU6050_ADDR, CONFIG_REG, 1,&Data, 1, 1000));
 
 		threadSafePrintf("[IMU] Init Complete\n");
 	} else {
@@ -77,21 +81,21 @@ void mpu60x0_update(){
 	sampleTime = getCurTime();
 	taskEXIT_CRITICAL();
 
-	Accel_X_RAW = (int16_t)(Rec_Data[0] << 8 | Rec_Data [1]);
-	Accel_Y_RAW = (int16_t)(Rec_Data[2] << 8 | Rec_Data [3]);
-	Accel_Z_RAW = (int16_t)(Rec_Data[4] << 8 | Rec_Data [5]);
+	Accel_X_RAW = ((int16_t)(Rec_Data[0]) << 8 | Rec_Data [1]);
+	Accel_Y_RAW = ((int16_t)(Rec_Data[2]) << 8 | Rec_Data [3]);
+	Accel_Z_RAW = ((int16_t)(Rec_Data[4]) << 8 | Rec_Data [5]);
 
-	Ax = Accel_X_RAW / ((float)(INT16_MAX)) * 8.0; //Full-scale range is 8 g
-	Ay = Accel_Y_RAW / ((float)(INT16_MAX)) * 8.0;
-	Az = Accel_Z_RAW / ((float)(INT16_MAX)) * 8.0;
+	Ax = (float)Accel_X_RAW / ((float)(INT16_MAX)) * 8.0; //Full-scale range is 8 g
+	Ay = (float)Accel_Y_RAW / ((float)(INT16_MAX)) * 8.0;
+	Az = (float)Accel_Z_RAW / ((float)(INT16_MAX)) * 8.0;
 
-	Gyro_X_RAW = (int16_t)(Rec_Data[8]  << 8 | Rec_Data [9]);
-	Gyro_Y_RAW = (int16_t)(Rec_Data[10] << 8 | Rec_Data [11]);
-	Gyro_Z_RAW = (int16_t)(Rec_Data[12] << 8 | Rec_Data [13]);
+	Gyro_X_RAW = ((int16_t)(Rec_Data[8])  << 8 | Rec_Data [9]);
+	Gyro_Y_RAW = ((int16_t)(Rec_Data[10]) << 8 | Rec_Data [11]);
+	Gyro_Z_RAW = ((int16_t)(Rec_Data[12]) << 8 | Rec_Data [13]);
 
-	Gx = Gyro_X_RAW / ((float)(INT16_MAX)) * 500.0; //Full-scale range is 500 deg/sec
-	Gy = Gyro_Y_RAW / ((float)(INT16_MAX)) * 500.0;
-	Gz = Gyro_Z_RAW / ((float)(INT16_MAX)) * 500.0;
+	Gx = (float)Gyro_X_RAW / ((float)(INT16_MAX)) * 1000.0; //Full-scale range is 500 deg/sec
+	Gy = (float)Gyro_Y_RAW / ((float)(INT16_MAX)) * 1000.0;
+	Gz = (float)Gyro_Z_RAW / ((float)(INT16_MAX)) * 1000.0;
 
 }
 

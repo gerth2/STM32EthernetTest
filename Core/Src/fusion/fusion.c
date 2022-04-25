@@ -2,9 +2,9 @@
 #include "fusion.h"
 
 // Calibration-corrected imu values
-rotation2d_t calAdjGyroX;
-rotation2d_t calAdjGyroY;
-rotation2d_t calAdjGyroZ;
+float calAdjGyroX;
+float calAdjGyroY;
+float calAdjGyroZ;
 float calAdjAccelX = 0;
 float calAdjAccelY = 0;
 float calAdjAccelZ = 0;
@@ -51,9 +51,9 @@ void fusion_update(){
 	calUpdate(mpu60x0_getXGyro(), mpu60x0_getYGyro(), mpu60x0_getZGyro(), mpu60x0_getXAccel(), mpu60x0_getYAccel(), mpu60x0_getZAccel());
 
 	//Apply sensor calibration to readings
-	rot2d_fromDegrees(&calAdjGyroX, cal_applyGyroX(mpu60x0_getXGyro()));
-	rot2d_fromDegrees(&calAdjGyroY, cal_applyGyroY(mpu60x0_getYGyro()));
-	rot2d_fromDegrees(&calAdjGyroZ, cal_applyGyroZ(mpu60x0_getZGyro()));
+	calAdjGyroX = cal_applyGyroX(mpu60x0_getXGyro());
+	calAdjGyroY = cal_applyGyroY(mpu60x0_getYGyro());
+	calAdjGyroZ = cal_applyGyroZ(mpu60x0_getZGyro());
 	calAdjAccelX = cal_applyAccelX(mpu60x0_getXAccel());
 	calAdjAccelY = cal_applyAccelY(mpu60x0_getYAccel());
 	calAdjAccelZ = cal_applyAccelZ(mpu60x0_getZAccel());
@@ -63,10 +63,18 @@ void fusion_update(){
 		//Loop Time
 		float deltaTime = (sampleTime - prevSampleTime);
 
+		//calc translation this loop
+		rotation2d_t deltaPitch;
+		rot2d_fromDegrees(&deltaPitch, calAdjGyroX * deltaTime);
+		rotation2d_t deltaRoll;
+		rot2d_fromDegrees(&deltaRoll, calAdjGyroY * deltaTime);
+		rotation2d_t deltaYaw;
+		rot2d_fromDegrees(&deltaYaw, calAdjGyroZ * deltaTime);
+
 		//Accumulate gyro
-		rot2d_integrate(&pitch, &calAdjGyroX, deltaTime);
-		rot2d_integrate(&roll, &calAdjGyroY, deltaTime);
-		rot2d_integrate(&yaw, &calAdjGyroZ, deltaTime);
+		rot2d_rotateBy(&pitch, &deltaPitch);
+		rot2d_rotateBy(&roll, &deltaRoll);
+		rot2d_rotateBy(&yaw, &deltaYaw);
 
 		//Pitch Complementary Filter
 		float accelForPitch = sqrtf(calAdjAccelY*calAdjAccelY + calAdjAccelZ*calAdjAccelZ);
@@ -122,15 +130,15 @@ float fusion_getZAccel(){
 }
 
 float fusion_getXGyro(){
-	return rot2d_toDegrees(&calAdjGyroX);
+	return calAdjGyroX;
 }
 
 float fusion_getYGyro(){
-	return rot2d_toDegrees(&calAdjGyroY);
+	return calAdjGyroY;
 }
 
 float fusion_getZGyro(){
-	return rot2d_toDegrees(&calAdjGyroZ);
+	return calAdjGyroZ;
 }
 
 float fusion_getSampleTime(){

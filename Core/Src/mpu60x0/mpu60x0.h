@@ -21,6 +21,7 @@
 
 
 #define SMPLRT_DIV_REG 0x19
+#define CONFIG_REG 0x1A
 #define GYRO_CONFIG_REG 0x1B
 #define ACCEL_CONFIG_REG 0x1C
 #define ACCEL_XOUT_H_REG 0x3B
