@@ -9,6 +9,7 @@
 #include "timeManager.h"
 #include "runningCal.h"
 #include "rotation2d.h"
+#include "mahony.h"
 
 void fusion_reset();
 
