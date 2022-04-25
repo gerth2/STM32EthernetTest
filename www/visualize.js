@@ -134,7 +134,7 @@ function loop(time_ms) {
     timeLast = time_ms;
 
     //temp test - rotate 30 deg/sec
-    yawDeg += 30.0 * timeDelta / 1000.0;
+    //yawDeg += 30.0 * timeDelta / 1000.0;
     //rollDeg += 40.0 * timeDelta / 1000.0;
     //pitchDeg += 73.0 * timeDelta / 1000.0;
 

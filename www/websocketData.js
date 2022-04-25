@@ -33,6 +33,14 @@ function wsOnMessageHandler(event) {
             row.cells[0].innerHTML = key;
             row.cells[1].innerHTML = rxData[key];
 
+            if(key == "pitch"){
+                setPitchDeg(value);
+            } else if (key == "roll"){
+                setRollDeg(value);
+            } else if (key == "yaw"){
+                setYawDeg(value);
+            }
+
         }
 	} else if (rxData.msgType == "curSettings") {
 

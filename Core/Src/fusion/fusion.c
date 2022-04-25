@@ -18,9 +18,9 @@ bool rollFusionActive = false;
 bool pitchFusionActive = false;
 
 //Complimentary filter calibrations
-float compFilt_accel_trust_factor = 0.02;
-float compFilt_min_accel = 0.7;
-float compFilt_max_accel = 2.5;
+float compFilt_accel_trust_factor = 0.2;
+float compFilt_min_accel = 0.9;
+float compFilt_max_accel = 1.25;
 
 float sampleTime = 0;
 float prevSampleTime = -1;

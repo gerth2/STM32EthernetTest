@@ -12,6 +12,8 @@ unsigned char calState = CAL_STATE_INACTIVE;
 
 unsigned char calDbnc;
 
+bool useRunningCal = false;
+
 void calInit(){
 	circBuffer_init(&gyroXCalBuffer, CAL_INIT_LOOPS, 0.0);
 	circBuffer_init(&gyroYCalBuffer, CAL_INIT_LOOPS, 0.0);
@@ -36,7 +38,7 @@ void calUpdate(float gyroX_raw, float gyroY_raw, float gyroZ_raw, float accelX_r
 
 		calState = CAL_STATE_ACTIVE;
 
-	} else {
+	} else if(useRunningCal) {
 		//Normal rolling calibration mode.
 		float accelX = cal_applyAccelX(accelX_raw);
 		float accelY = cal_applyAccelX(accelY_raw);
@@ -55,7 +57,7 @@ void calUpdate(float gyroX_raw, float gyroY_raw, float gyroZ_raw, float accelX_r
 				calDbnc--;
 			}
 		} else {
-			calDbnc = 30;
+			calDbnc = CAL_DBNC_TIMER_LOOPS;
 		}
 
 		if(calDbnc == 0){
@@ -65,6 +67,10 @@ void calUpdate(float gyroX_raw, float gyroY_raw, float gyroZ_raw, float accelX_r
 			circBuffer_add(&gyroZCalBuffer, gyroZ_raw);
 			calState = CAL_STATE_ACTIVE;
 		}
+	} else {
+		calState = CAL_STATE_INACTIVE;
+		calDbnc = CAL_DBNC_TIMER_LOOPS;
+
 	}
 
 	if(calState == CAL_STATE_ACTIVE){

@@ -4,6 +4,7 @@
 
 #include "circBuffer.h"
 #include <math.h>
+#include <stdbool.h>
 
 #define CAL_EXPECTED_GYRO_X 0
 #define CAL_EXPECTED_GYRO_Y 0
@@ -14,6 +15,7 @@
 #define CAL_EXPECTED_ACCEL_NORM 1.0
 
 #define CAL_INIT_LOOPS 99
+#define CAL_DBNC_TIMER_LOOPS 30
 
 #define CAL_STATE_INACTIVE 0
 #define CAL_STATE_ACTIVE 1
