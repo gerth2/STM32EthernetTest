@@ -16,13 +16,22 @@
     </div>
 
     <div id="Status" class="tabcontent">
-        <table id="dataTable">
-            <tr>
-                <th style="width:100px">Data</th>
-                <th style="width:200px">Value</th>
-            </tr>
-        </table>
-        <hr>
+        <div class="flex-container">
+            <div>
+                <table id="dataTable">
+                    <tr>
+                        <th style="width:100px">Data</th>
+                        <th style="width:200px">Value</th>
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 550px;">
+                <canvas id="visualization">
+
+                </canvas>
+            </div>
+
+        </div>
     </div>
 
     <!-------------------------------------------------------------------------------------->
@@ -96,7 +105,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <p>
-                <div id="modalText"></div>
+            <div id="modalText"></div>
             </p>
         </div>
 
@@ -105,9 +114,10 @@
 
     <script src="modal.js"></script>
     <script src="tabs.js"></script>
-    <script src="settings.js"></script>
-    <script src="websocketData.js"></script>
-    <script src="main.js"></script>
+    <script src="visualize.js"></script>
+    <!--<script src="settings.js"></script> -->
+    <!--<script src="websocketData.js"></script> -->
+    <!-- <script src="main.js"></script> -->
 </body>
 
 </html>

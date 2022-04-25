@@ -146,3 +146,20 @@ button {
   text-decoration: none;
   cursor: pointer;
 }
+
+/* Visualization */
+
+canvas {
+  outline: 2px solid white;
+}
+
+/* Flex stuff */
+
+.flex-container {
+  display: flex;
+}
+
+.flex-container > div {
+  width: 500px;
+  margin: 10px;
+}
