@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include "set.h"
 
 #define NT4_TYPESTR_BOOL "boolean" 
 #define NT4_TYPESTR_FLOAT_64 "double" 
@@ -21,8 +24,7 @@
 #define NT4_TYPESTR_FLOAT_32_ARR "float[]" 
 #define NT4_TYPESTR_STR_ARR "string[]" 
 
-#define MAX_SUBSCRIPTIONS 10
-
+#define NT4_TIME_TOPIC_ID -1
 
 typedef struct nt4_subscriptionOptions {
     bool immedeate;
@@ -32,8 +34,8 @@ typedef struct nt4_subscriptionOptions {
 
 typedef struct nt4_subscription {
     char ** prefixes;
-    uint32_t uid;
-    nt4_subscriptionOptions_t options;
+    int32_t uid;
+    nt4_subscriptionOptions_t * options;
 } nt4_subscription_t;
 
 typedef struct nt4_topicProperties {
@@ -43,7 +45,7 @@ typedef struct nt4_topicProperties {
 typedef struct nt4_topic {
     char * name;
     char * type;
-    uint32_t id;
+    int32_t id;
 
 } nt4_topic_t;
 
