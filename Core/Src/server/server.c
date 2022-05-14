@@ -161,7 +161,9 @@ void serverUpdate(void) {
 
 void serverShutdown(void) {
 
-	mg_mgr_free(&mgr);                                    // Unreachable
+	if(serverIsRunning){
+		mg_mgr_free(&mgr);
+	}
 
 	serverIsRunning = 0;
 }
