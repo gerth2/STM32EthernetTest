@@ -154,10 +154,10 @@ uint8_t begin(
 
 	//Set up UPD socket
 
-	mdnsSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP  );
+	//mdnsSocket = socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP  );
 
     /* Check the socket was created successfully. */
-    if( mdnsSocket != FREERTOS_INVALID_SOCKET )
+    if( mdnsSocket != -1 )
     {
         /* The socket was created successfully and can now be used to send data
         using the FreeRTOS_sendto() API function.  Sending to a socket that has
@@ -166,6 +166,7 @@ uint8_t begin(
         specific port number.  This example binds the socket to port 9999.  The
         port number is specified in network byte order, so FreeRTOS_htons() is
         used. */
+    	/* TODO bind to berkely sockets in w5500
         xBindAddress.sin_port = FreeRTOS_htons( MDNS_PORT );
         if( FreeRTOS_bind( mdnsSocket, &xBindAddress, sizeof( &xBindAddress ) ) == 0 )
         {
@@ -174,19 +175,21 @@ uint8_t begin(
         	threadSafePrintf("[MDNS] Socket bind failed. MDNS not available.\n");
         	return 2;
         }
+        */
 
+    	//TODO all part of ws5500 implementation
         //Set the socket timeouts to zero so it's non-blocking
-        FreeRTOS_setsockopt( mdnsSocket,
-                            0,                   /* Not used. */
-                            FREERTOS_SO_RCVTIMEO,/* Setting receive timeout. */
-                            &timeout_ms, /* The timeout value. */
-                            0 );                 /* Not used. */
+        //FreeRTOS_setsockopt( mdnsSocket,
+        //                    0,                   /* Not used. */
+        //                    FREERTOS_SO_RCVTIMEO,/* Setting receive timeout. */
+         //                   &timeout_ms, /* The timeout value. */
+         //                   0 );                 /* Not used. */
 
-        FreeRTOS_setsockopt( mdnsSocket,
-                            0,                   /* Not used. */
-                            FREERTOS_SO_SNDTIMEO,/* Setting send timeout. */
-                            &timeout_ms,    /* The timeout value. */
-                            0 );                 /* Not used. */
+        //FreeRTOS_setsockopt( mdnsSocket,
+        //                    0,                   /* Not used. */
+        //                    FREERTOS_SO_SNDTIMEO,/* Setting send timeout. */
+        //                    &timeout_ms,    /* The timeout value. */
+        //                    0 );                 /* Not used. */
     }
     else
     {
@@ -787,28 +790,11 @@ void mdns_update(){
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
 	uint8_t ucBuffer[ RX_BUFFER_SIZE ];
 	int8_t cIPAddressString[ 16 ];
-	struct freertos_sockaddr xSourceAddress;
-	socklen_t xAddressLength = sizeof(xSourceAddress);
+	//struct freertos_sockaddr xSourceAddress;
+	//socklen_t xAddressLength = sizeof(xSourceAddress);
 	int32_t iReturned;
 
-	    /* Receive into the buffer with ulFlags set to 0, so the FREERTOS_ZERO_COPY bit
-	    is clear. */
-	    iReturned = FreeRTOS_recvfrom(
-	                                    /* The socket data is being received on. */
-	                                    mdnsSocket,
-	                                    /* The buffer into which received data will be
-	                                    copied. */
-	                                    ucBuffer,
-	                                    /* The length of the buffer into which data will be
-	                                    copied. */
-										RX_BUFFER_SIZE,
-	                                    /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */
-	                                    0,
-	                                    /* Will get set to the source of the received data. */
-	                                    &xSourceAddress,
-	                                    /* Not used but should be set as shown. */
-	                                    &xAddressLength
-	                               );
+	    //TODO rx data into ucBuffer
 
 	    if( iReturned > 0 )
 	    {

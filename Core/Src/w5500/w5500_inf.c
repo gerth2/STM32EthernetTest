@@ -26,8 +26,7 @@ void W5500_init(SPI_HandleTypeDef sh_in) {
 	}
 	HAL_GPIO_WritePin(SPI1_ETH_RESET_GPIO_Port, SPI1_ETH_RESET_Pin, GPIO_PIN_SET);
 
-	//Open up a single socket in raw mode
-	wn_socket(0, Sn_MR_MACRAW, 0, flag);
+	//Todo - init chip hardware?
 
 	threadSafePrintf("[MAC] Init Completed!\n");
 

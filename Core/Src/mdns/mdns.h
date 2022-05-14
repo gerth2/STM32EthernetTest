@@ -2,9 +2,7 @@
 #define _MDNS_H
 
 #include <stdint.h>
-#include <FreeRTOS.h>
-#include <FreeRTOS_IP.h>
-#include "FreeRTOS_sockets.h"
+#include "socket.h"
 #include <ctype.h>
 #include "settings.h"
 #include "debugUtils.h"

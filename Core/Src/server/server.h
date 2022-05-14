@@ -2,8 +2,6 @@
 #define SERVER_H
 
 #include <FreeRTOS.h>
-#include <FreeRTOS_IP.h>
-#include "FreeRTOS_IP_Private.h"
 #include <math.h>
 #include "debugUtils.h"
 
@@ -16,7 +14,6 @@
 #include "fusion.h"
 #include "perfMon.h"
 #include "statusLED.h"
-#include "mac_driver.h"
 
 /** Public API */
 void serverInit(void);
