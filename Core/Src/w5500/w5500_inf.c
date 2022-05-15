@@ -1,7 +1,7 @@
 
 #include <w5500_inf.h>
 
-static SPI_HandleTypeDef SpiHandle;
+static SPI_HandleTypeDef * SpiHandle;
 
 
 void W5500_Select(void) {
@@ -12,7 +12,7 @@ void W5500_Unselect(void) {
 	HAL_GPIO_WritePin(SPI1_ETH_CS_GPIO_Port, SPI1_ETH_CS_Pin, GPIO_PIN_SET);
 }
 
-void W5500_init(SPI_HandleTypeDef sh_in) {
+void W5500_init(SPI_HandleTypeDef * sh_in) {
 	int i;
 
 	threadSafePrintf("[MAC] Starting Init...\n");
@@ -61,12 +61,12 @@ void handleSPIErr(HAL_StatusTypeDef errStatus){
 }
 
 void W5500_ReadBuff(uint8_t* buff, uint16_t len) {
-	handleSPIErr(HAL_SPI_Receive(&SpiHandle, buff, len, 100));
+	handleSPIErr(HAL_SPI_Receive(SpiHandle, buff, len, 100));
 	return;
 }
 
 void W5500_WriteBuff(uint8_t* buff, uint16_t len) {
-    handleSPIErr(HAL_SPI_Transmit(&SpiHandle, buff, len, 100));
+    handleSPIErr(HAL_SPI_Transmit(SpiHandle, buff, len, 100));
     return;
 }
 

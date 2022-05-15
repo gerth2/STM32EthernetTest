@@ -1,9 +1,4 @@
-#include <stdbool.h>
-#include <stdarg.h>
-
 #include "socket.h"
-#include <time.h>
-#include <stdlib.h>
 
 
 #define MG_DIRSEP '/'

@@ -15,6 +15,10 @@
 #include "perfMon.h"
 #include "statusLED.h"
 
+#define SERVER_NOCHANGE 0
+#define SERVER_INIT 1
+#define SERVER_SHUTDOWN 2
+
 /** Public API */
 void serverInit(void);
 void serverUpdate(void);

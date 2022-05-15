@@ -2,6 +2,7 @@
 
 
 uint8_t serverIsRunning = 0;
+uint8_t serverStatus = SERVER_NOCHANGE;
 
 static const char *s_debug_level = "3";
 static const char *s_listening_address = "ws://0.0.0.0:5800"; //not sure if the prefix matters or not, but his is both for http and ws currently

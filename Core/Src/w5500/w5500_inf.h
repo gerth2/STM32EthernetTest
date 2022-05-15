@@ -11,4 +11,4 @@
 #define debug(format, ...)     threadSafePrintf(format,##__VA_ARGS__)
 
 
-void W5500_init(SPI_HandleTypeDef sh_in);
+void W5500_init(SPI_HandleTypeDef * sh_in);

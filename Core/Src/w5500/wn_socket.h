@@ -82,8 +82,8 @@
  * Following figure shows network flow diagram by WIZnet SOCKET API.
  * @image html WIZnet_SOCKET.jpg "<WIZnet SOCKET API>"
  */
-#ifndef _SOCKET_H_
-#define _SOCKET_H_
+#ifndef _WNSOCKET_H_
+#define _WNSOCKET_H_
 #ifdef __cplusplus
  extern "C" {
 #endif

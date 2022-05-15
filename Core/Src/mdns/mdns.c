@@ -78,7 +78,7 @@ uint8_t _txtDataLength = 0;
 
 const uint8_t dip[] = MDNS_ADDR;
 
-struct freertos_sockaddr xBindAddress;
+//struct freertos_sockaddr xBindAddress;
 
 const char service_type_enumeration_P[] = {
 	9, '_', 's', 'e', 'r', 'v', 'i', 'c', 'e', 's',
@@ -88,7 +88,7 @@ const char service_type_enumeration_P[] = {
 	0
 };
 
-Socket_t mdnsSocket;
+int mdnsSocket;
 
 //Private forward declarations
 void sendResponse(
@@ -154,7 +154,7 @@ uint8_t begin(
 
 	//Set up UPD socket
 
-	//mdnsSocket = socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP  );
+	mdnsSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP  );
 
     /* Check the socket was created successfully. */
     if( mdnsSocket != -1 )
@@ -429,9 +429,9 @@ void advertise()
       RESPONSE_DOMAIN_LOCAL,
       0,
       0,
-	  FreeRTOS_htons(MDNS_PORT),
+	  htons(MDNS_PORT),
       (uint8_t*)dip,
-	  FreeRTOS_htons(MDNS_PORT)
+	  htons(MDNS_PORT)
     );
 }
 
@@ -720,30 +720,17 @@ void sendResponse(
 	}
 
 	// Off it goes
-	struct freertos_sockaddr xDestinationAddress;
+	//struct freertos_sockaddr xDestinationAddress;
 	int32_t iReturned;
 
-	xDestinationAddress.sin_family = FREERTOS_AF_INET;
-    xDestinationAddress.sin_addr = FreeRTOS_inet_addr_quick( src_ip[0], src_ip[1], src_ip[2], src_ip[3] );
-    xDestinationAddress.sin_port = ( src_port ); //conversion to byte order already done.
-    xDestinationAddress.sin_len = sizeof(xDestinationAddress);
+	//xDestinationAddress.sin_family = FREERTOS_AF_INET;
+    //xDestinationAddress.sin_addr = FreeRTOS_inet_addr_quick( src_ip[0], src_ip[1], src_ip[2], src_ip[3] );
+    //xDestinationAddress.sin_port = ( src_port ); //conversion to byte order already done.
+    //xDestinationAddress.sin_len = sizeof(xDestinationAddress);
 
     /* Send the buffer with ulFlags set to 0, so the FREERTOS_ZERO_COPY bit
     is clear. */
-    iReturned = FreeRTOS_sendto(
-                                    /* The socket being send to. */
-                                    mdnsSocket,
-                                    /* The data being sent. */
-                                    _response,
-                                    /* The length of the data being sent. */
-									_responseLen,
-                                    /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */
-                                    0,
-                                    /* Where the data is being sent. */
-                                    &xDestinationAddress,
-                                    /* Not used but should be set as shown. */
-                                    sizeof( xDestinationAddress )
-                               );
+	//TODO send the packet to the socket
 
     if( iReturned == _responseLen )
     {
@@ -790,7 +777,7 @@ void mdns_update(){
 	/* Note - the RTOS task stack must be big enough to hold this array!. */
 	uint8_t ucBuffer[ RX_BUFFER_SIZE ];
 	int8_t cIPAddressString[ 16 ];
-	//struct freertos_sockaddr xSourceAddress;
+	struct sockaddr_in xSourceAddress;
 	//socklen_t xAddressLength = sizeof(xSourceAddress);
 	int32_t iReturned;
 
@@ -800,7 +787,7 @@ void mdns_update(){
 	    {
 	        /* Data was received from the socket.  Prepare the IP address for
 	        printing to the console by converting it to a string. */
-	        FreeRTOS_inet_ntoa( xSourceAddress.sin_addr, ( char * ) cIPAddressString );
+	        //FreeRTOS_inet_ntoa( xSourceAddress.sin_addr, ( char * ) cIPAddressString );
 
 	        /* Print out details of the data source. */
 	        //threadSafePrintf( "[MDNS] Received %d bytes from IP address %s port number %drn\n",
@@ -811,7 +798,7 @@ void mdns_update(){
 
 	        onUdpReceive(
 	        	dip,
-				FreeRTOS_htons(MDNS_PORT),
+				htons(MDNS_PORT),
 				&xSourceAddress.sin_addr,
 				xSourceAddress.sin_port,
 				ucBuffer,

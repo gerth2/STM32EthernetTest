@@ -29,8 +29,7 @@
 #include "eeprom.h"
 #include "statusLED.h"
 #include "shutdown.h"
-
-#include "mac_driver/mac_driver.h"
+#include "w5500_inf.h"
 
 /* USER CODE END Includes */
 
@@ -167,7 +166,7 @@ int main(void)
   mpu60x0_init(hi2c1);
   fusion_reset();
   settings_init();
-  MAC_Init();
+  W5500_init(&hspi1);
   threadSafePrintf("[MAIN] User Init Completed!\n");
 
 
