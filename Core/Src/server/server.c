@@ -137,22 +137,11 @@ void serverInit(void) {
 	mg_mgr_init(&mgr);
 	threadSafePrintf("Starting Mongoose v%s", MG_VERSION);  // Tell the world
 	mg_http_listen(&mgr, s_listening_address, cb, &mgr);  // Web listener
-	mdns_init();
 
 	serverIsRunning = 1;
 }
 
 void serverUpdate(void) {
-
-	if (serverStatus == SERVER_INIT) {
-		serverInit();
-		serverStatus = SERVER_NOCHANGE;
-	}
-
-	if (serverStatus == SERVER_SHUTDOWN) {
-		serverShutdown();
-		serverStatus = SERVER_NOCHANGE;
-	}
 
 	if (serverIsRunning) {
 		periodicWSDataSend();

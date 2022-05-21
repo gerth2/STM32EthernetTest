@@ -1,15 +1,27 @@
 
 #include <w5500_inf.h>
+#include "wizchip_conf.h"
 
 static SPI_HandleTypeDef * SpiHandle;
 
 
+volatile bool ip_assigned = false;
+
+void Callback_IPAssigned(void) {
+    UART_Printf("Callback: IP assigned! Leased time: %d sec\r\n", getDHCPLeasetime());
+    ip_assigned = true;
+}
+
+void Callback_IPConflict(void) {
+    UART_Printf("Callback: IP conflict!\r\n");
+}
+
 void W5500_Select(void) {
-	HAL_GPIO_WritePin(SPI1_ETH_CS_GPIO_Port, SPI1_ETH_CS_Pin, GPIO_PIN_RESET);
+	wizchip_cs_select();
 }
 
 void W5500_Unselect(void) {
-	HAL_GPIO_WritePin(SPI1_ETH_CS_GPIO_Port, SPI1_ETH_CS_Pin, GPIO_PIN_SET);
+	wizchip_cs_deselect();
 }
 
 void W5500_init(SPI_HandleTypeDef * sh_in) {
@@ -26,7 +38,29 @@ void W5500_init(SPI_HandleTypeDef * sh_in) {
 	}
 	HAL_GPIO_WritePin(SPI1_ETH_RESET_GPIO_Port, SPI1_ETH_RESET_Pin, GPIO_PIN_SET);
 
-	//Todo - init chip hardware?
+	wizchip_sw_reset();
+	wizchip_init(NULL, NULL); //TODO - default 2kb buffer size?
+
+	uint8_t ver = getVERSIONR();
+	if(ver != 0x04){
+		threadSafePrintf("[MAC] Unexpected chip version %d!\n", ver);
+		while(1);
+	}
+
+    wiz_NetInfo net_info = {
+        .mac  = { 0xEA, 0x11, 0x22, 0x33, 0x44, 0xEA },
+        .dhcp = NETINFO_STATIC,
+		.ip   = {10, 111, 76, 123},
+		.sn   = {255, 255, 255, 0},
+		.gw   = {10, 111, 76, 1},
+		.dns  = {1, 1, 1, 1},
+
+    };
+
+    // set MAC and IP config
+    setSHAR(net_info.mac);
+    wizchip_setnetinfo(&net_info);
+
 
 	threadSafePrintf("[MAC] Init Completed!\n");
 

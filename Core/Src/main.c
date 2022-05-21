@@ -167,6 +167,8 @@ int main(void)
   fusion_reset();
   settings_init();
   W5500_init(&hspi1);
+  serverInit();
+  //mdns_init();
   threadSafePrintf("[MAIN] User Init Completed!\n");
 
 
@@ -467,7 +469,7 @@ void StartDefaultTask(void *argument)
 	/* Infinite loop */
 	for (;;) {
 		osDelay(10);
-		mdns_update(); //currently this function blocks like foreverz so...it's here.
+		//mdns_update(); //currently this function blocks like foreverz so...it's here.
 		//perfmon_printHeapStats();
 	}
   /* USER CODE END 5 */

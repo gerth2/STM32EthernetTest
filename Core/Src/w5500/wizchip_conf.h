@@ -59,6 +59,11 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
+#include "stm32f4xx_hal.h"
+#include "main.h"
+#include "FreeRTOS.h"
+
 /**
  * @brief Select WIZCHIP.
  * @todo You should select one, \b W5100, \b W5100S, \b W5200, \b W5300, \b W5500 or etc. \n\n
@@ -450,6 +455,9 @@ typedef struct wiz_NetTimeout_t
    uint8_t  retry_cnt;     ///< retry count 
    uint16_t time_100us;    ///< time unit 100us
 }wiz_NetTimeout;
+
+void wizchip_cs_deselect(void);
+void wizchip_cs_select(void);
 
 /**
  *@brief Registers call back function for critical section of I/O functions such as
