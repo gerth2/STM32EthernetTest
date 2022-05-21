@@ -82,9 +82,7 @@ void       wizchip_cris_exit(void)          {}
  */
 //void     wizchip_cs_select(void)            {};
 
-void wizchip_cs_select(void) {
-	HAL_GPIO_WritePin(SPI1_ETH_CS_GPIO_Port, SPI1_ETH_CS_Pin, GPIO_PIN_RESET);
-}
+void wizchip_cs_select(void) {}
 
 /**
  * @brief Default function to deselect chip.
@@ -92,9 +90,7 @@ void wizchip_cs_select(void) {
  * null function is called.
  */
 //void     wizchip_cs_deselect(void)          {};
-void wizchip_cs_deselect(void) {
-	HAL_GPIO_WritePin(SPI1_ETH_CS_GPIO_Port, SPI1_ETH_CS_Pin, GPIO_PIN_SET);
-}
+void wizchip_cs_deselect(void) {}
 
 /**
  * @brief Default function to read in direct or indirect interface.
