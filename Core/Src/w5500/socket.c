@@ -31,7 +31,7 @@ int socket(int domain, int type, int protocol)
 	   return -1;
 
    ret = wn_socket(i, internal_protocol, (DFLT_PORT+i), 0x00);
-   threadSafePrintf("\r\nSocket:%d Port:%d\r\n", i, (DFLT_PORT+i));
+   threadSafePrintf("[SOCKET] New Socket:%d Port:%d\r\n", i, (DFLT_PORT+i));
 
    return ret;
 }
@@ -83,7 +83,7 @@ int listen(int s, int backlog)
 
    ret = wn_listen(s);
 
-   return ret;
+   return (ret==SOCK_OK?0:-1);
 }
 
 int recv(int s, void *mem, size_t len, int flags)
@@ -159,7 +159,7 @@ int getsockopt (int s, int level, int optname, void *optval, socklen_t *optlen)
 
 int setsockopt (int s, int level, int optname, const void *optval, socklen_t optlen)
 {
-   return 0;
+	return 0;
 }
 
 

@@ -8,12 +8,12 @@ static SPI_HandleTypeDef * SpiHandle;
 volatile bool ip_assigned = false;
 
 void Callback_IPAssigned(void) {
-    UART_Printf("Callback: IP assigned! Leased time: %d sec\r\n", getDHCPLeasetime());
+    threadSafePrintf("Callback: IP assigned! \r\n");
     ip_assigned = true;
 }
 
 void Callback_IPConflict(void) {
-    UART_Printf("Callback: IP conflict!\r\n");
+	threadSafePrintf("Callback: IP conflict!\r\n");
 }
 
 void W5500_EnterCrit(void) {
